@@ -2,13 +2,17 @@ package app.gamenative.data
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
 import java.io.File
+import java.util.concurrent.CopyOnWriteArrayList
 
 data class DownloadInfo(
     val jobCount: Int = 1,
+    val gameId: Int,
+    var downloadingAppIds: CopyOnWriteArrayList<Int>,
 ) {
     private var downloadJob: Job? = null
     private val downloadProgressListeners = mutableListOf<((Float) -> Unit)>()
@@ -24,24 +28,36 @@ data class DownloadInfo(
 
     private data class SpeedSample(val timeMs: Long, val bytes: Long)
 
-    private val speedSamples = ArrayDeque<SpeedSample>()
+    private val speedSamples = CopyOnWriteArrayList<SpeedSample>()
     private var emaSpeedBytesPerSec: Double = 0.0
     private var hasEmaSpeed: Boolean = false
     private var isActive: Boolean = true
     private val statusMessage = MutableStateFlow<String?>(null)
 
     fun cancel() {
+        cancel("Cancelled by user")
+    }
+
+    fun failedToDownload() {
+        cancel("Failed to download")
+    }
+
+    fun cancel(message: String) {
         // Persist the most recent progress so a resume can pick up where it left off.
         persistProgressSnapshot()
         // Mark as inactive and clear speed tracking so a future resume
         // does not use stale samples.
         setActive(false)
         resetSpeedTracking()
-        downloadJob?.cancel(CancellationException("Cancelled by user"))
+        downloadJob?.cancel(CancellationException(message))
     }
 
     fun setDownloadJob(job: Job) {
         downloadJob = job
+    }
+
+    suspend fun awaitCompletion(timeoutMs: Long = 5000L) {
+        withTimeoutOrNull(timeoutMs) { downloadJob?.join() }
     }
 
     fun getProgress(): Float {
@@ -50,7 +66,7 @@ data class DownloadInfo(
             val bytesProgress = (bytesDownloaded.toFloat() / totalExpectedBytes.toFloat()).coerceIn(0f, 1f)
             return bytesProgress
         }
-        
+
         // Fallback to depot-based progress only if we don't have byte tracking
         var total = 0f
         for (i in progresses.indices) {
@@ -117,14 +133,14 @@ data class DownloadInfo(
     fun getStatusMessageFlow(): StateFlow<String?> = statusMessage
 
     private fun addSpeedSample(timestampMs: Long) {
-        speedSamples.addLast(SpeedSample(timestampMs, bytesDownloaded))
+        speedSamples.add(SpeedSample(timestampMs, bytesDownloaded))
         trimOldSamples(timestampMs)
     }
 
     private fun trimOldSamples(nowMs: Long, windowMs: Long = 30_000L) {
         val cutoff = nowMs - windowMs
         while (speedSamples.isNotEmpty() && speedSamples.first().timeMs < cutoff) {
-            speedSamples.removeFirst()
+            speedSamples.removeAt(0)
         }
     }
 

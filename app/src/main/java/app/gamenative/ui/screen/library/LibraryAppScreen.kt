@@ -96,6 +96,15 @@ import app.gamenative.ui.theme.PluviaTheme
 import app.gamenative.ui.util.AdaptiveHeroHeight
 import com.skydoves.landscapist.ImageOptions
 import com.skydoves.landscapist.coil.CoilImage
+import app.gamenative.utils.SteamUtils
+import com.winlator.container.ContainerData
+import com.winlator.xenvironment.ImageFsInstaller
+import com.winlator.fexcore.FEXCoreManager
+import app.gamenative.ui.screen.library.appscreen.SteamAppScreen
+import app.gamenative.ui.screen.library.appscreen.CustomGameAppScreen
+import app.gamenative.ui.screen.library.appscreen.GOGAppScreen
+import app.gamenative.ui.screen.library.appscreen.EpicAppScreen
+import app.gamenative.ui.data.GameDisplayInfo
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -354,6 +363,7 @@ private fun InfoCard(
 fun AppScreen(
     libraryItem: LibraryItem,
     onClickPlay: (Boolean) -> Unit,
+    onTestGraphics: () -> Unit,
     onBack: () -> Unit,
 ) {
     // Get the appropriate screen model based on game source
@@ -361,6 +371,8 @@ fun AppScreen(
         when (libraryItem.gameSource) {
             app.gamenative.data.GameSource.STEAM -> SteamAppScreen()
             app.gamenative.data.GameSource.CUSTOM_GAME -> CustomGameAppScreen()
+            app.gamenative.data.GameSource.GOG -> GOGAppScreen()
+            app.gamenative.data.GameSource.EPIC -> EpicAppScreen()
         }
     }
 
@@ -368,6 +380,7 @@ fun AppScreen(
     screenModel.Content(
         libraryItem = libraryItem,
         onClickPlay = onClickPlay,
+        onTestGraphics = onTestGraphics,
         onBack = onBack,
     )
 }
@@ -398,6 +411,7 @@ internal fun AppScreenContent(
     downloadProgress: Float,
     hasPartialDownload: Boolean,
     isUpdatePending: Boolean,
+    downloadInfo: app.gamenative.data.DownloadInfo? = null,
     onDownloadInstallClick: () -> Unit,
     onPauseResumeClick: () -> Unit,
     onDeleteDownloadClick: () -> Unit,
@@ -492,8 +506,276 @@ internal fun AppScreenContent(
             .onKeyEvent { handleKeyEvent(it.nativeKeyEvent) },
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Main scrollable content
-            Box(modifier = Modifier.weight(1f)) {
+        // Hero Section with Game Image Background
+        Box(modifier = Modifier.weight(1f)) {
+            // Hero background image
+            if (displayInfo.heroImageUrl != null) {
+            CoilImage(
+                modifier = Modifier.fillMaxSize(),
+                    imageModel = { displayInfo.heroImageUrl },
+                imageOptions = ImageOptions(contentScale = ContentScale.Crop),
+                loading = { LoadingScreen() },
+                failure = {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        // Gradient background as fallback
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                            color = MaterialTheme.colorScheme.primary
+                        ) { }
+                    }
+                },
+                previewPlaceholder = painterResource(R.drawable.testhero),
+            )
+            } else {
+                // Fallback gradient background when no hero image
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.primary
+                ) { }
+            }
+
+            // Gradient overlay
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.8f)
+                            )
+                        )
+                    )
+            )
+
+            // Compatibility status overlay (bottom center)
+            // Must be after gradient but before title to ensure visibility
+            if (displayInfo.compatibilityMessage != null && displayInfo.compatibilityColor != null) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .background(Color.Black.copy(alpha = 0.4f))
+                        .padding(horizontal = 8.dp, vertical = 1.dp)
+                ) {
+                    Text(
+                        text = displayInfo.compatibilityMessage,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(displayInfo.compatibilityColor),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+            }
+
+            // Back button (top left)
+            Box(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .background(
+                        color = Color.Black.copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+            ) {
+                BackButton(onClick = onBack)
+            }
+
+            // Settings/options button (top right)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(20.dp)
+            ) {
+                IconButton(
+                    modifier = Modifier
+                        .background(
+                            color = Color.Black.copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(12.dp)
+                        ),
+                    onClick = { optionsMenuVisible = !optionsMenuVisible },
+                    content = {
+                        Icon(
+                            Icons.Filled.MoreVert,
+                            contentDescription = "Settings",
+                            tint = Color.White
+                        )
+                    },
+                )
+
+                DropdownMenu(
+                    expanded = optionsMenuVisible,
+                    onDismissRequest = { optionsMenuVisible = false },
+                ) {
+                    optionsMenu.forEach { menuOption ->
+                        DropdownMenuItem(
+                            text = { Text(menuOption.optionType.text) },
+                            onClick = {
+                                menuOption.onClick()
+                                optionsMenuVisible = false
+                            },
+                        )
+                    }
+                }
+            }
+
+            // Game title and subtitle
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(20.dp)
+            ) {
+                Text(
+                    text = displayInfo.name,
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        shadow = Shadow(
+                            color = Color.Black.copy(alpha = 0.5f),
+                            offset = Offset(0f, 2f),
+                            blurRadius = 10f
+                        )
+                    ),
+                    color = Color.White
+                )
+
+                Text(
+                    text = "${displayInfo.developer} • ${remember(displayInfo.releaseDate) {
+                        if (displayInfo.releaseDate > 0) {
+                            SimpleDateFormat("yyyy", Locale.getDefault()).format(Date(displayInfo.releaseDate * 1000))
+                        } else {
+                            ""
+                        }
+                    }}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.9f)
+                )
+            }
+        }
+
+        // Content section
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+        ) {
+            // Action buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Pause/Resume and Delete when downloading or paused
+                // Use hasPartialDownload from BaseAppScreen (implemented per game source)
+                // Disable resume when Wi-Fi only is enabled and there's no Wi-Fi
+                val isResume = !isDownloading && hasPartialDownload
+                val pauseResumeEnabled = if (isResume) wifiAllowed else true
+                if (isDownloading || hasPartialDownload) {
+                    // Pause or Resume
+                    Button(
+                        enabled = pauseResumeEnabled,
+                        modifier = Modifier.weight(1f),
+                        onClick = onPauseResumeClick,
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                        contentPadding = PaddingValues(16.dp)
+                    ) {
+                        Text(
+                            text = if (isDownloading) stringResource(R.string.pause_download)
+                                   else stringResource(R.string.resume_download),
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                        )
+                    }
+                    // Delete (Cancel) download data
+                    OutlinedButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = onDeleteDownloadClick,
+                        shape = RoundedCornerShape(16.dp),
+                        border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                        contentPadding = PaddingValues(16.dp)
+                    ) {
+                        Text(stringResource(R.string.delete_app), style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
+                    }
+                } else {
+                    // Disable install when Wi-Fi only is enabled and there's no Wi-Fi
+                    val isInstall = !isInstalled
+                    val installEnabled = if (isInstall) wifiAllowed && hasInternet else true
+                    // For installed games, button should always be enabled (regardless of isValidToDownload)
+                    // For games that need installation, check isValidToDownload
+                    val buttonEnabled = if (isInstalled) {
+                        installEnabled // Installed games can always be played
+                    } else {
+                        installEnabled && isValidToDownload // Only check download validity when not installed
+                    }
+                    // Install or Play button
+                    Button(
+                        enabled = buttonEnabled,
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            onDownloadInstallClick()
+                        },
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                        contentPadding = PaddingValues(16.dp)
+                    ) {
+                        val text = when {
+                            isInstalled -> stringResource(R.string.run_app)
+                            !hasInternet -> stringResource(R.string.library_need_internet)
+                            !wifiConnected && PrefManager.downloadOnWifiOnly -> stringResource(R.string.library_wifi_only_enabled)
+                            else -> stringResource(R.string.install_app)
+                        }
+                        Text(
+                            text = text,
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                        )
+                    }
+                    // Uninstall/Delete button if already installed
+                    // This is shared functionality - all game types show delete button when installed
+                    // The action is handled by onDeleteDownloadClick which is implemented per game source
+                    if (isInstalled) {
+                        OutlinedButton(
+                            modifier = Modifier.weight(1f),
+                            onClick = { onDeleteDownloadClick() },
+                            shape = RoundedCornerShape(16.dp),
+                            border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                            contentPadding = PaddingValues(16.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.uninstall),
+                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Download progress section
+            if (isDownloading) {
+                // downloadInfo passed from BaseAppScreen based on game source
+                val statusMessageFlow = downloadInfo?.getStatusMessageFlow()
+                val statusMessageState = statusMessageFlow?.collectAsState(initial = statusMessageFlow.value)
+                val statusMessage = statusMessageState?.value
+
+                // Use DownloadInfo's byte-based ETA when available for more stable estimates
+                val timeLeftText = remember(displayInfo.appId, downloadProgress, downloadInfo, statusMessage) {
+                    val etaMs = downloadInfo?.getEstimatedTimeRemaining()
+                    if (etaMs != null && etaMs > 0L) {
+                        val totalSeconds = etaMs / 1000
+                        val minutesLeft = totalSeconds / 60
+                        val secondsPart = totalSeconds % 60
+                        "${minutesLeft}m ${secondsPart}s left"
+                    } else if (downloadProgress in 0f..1f && downloadProgress < 1f) {
+                        val statusText = statusMessage?.takeUnless { it.isBlank() }
+                        statusText ?: "Calculating..."
+                    } else {
+                        ""
+                    }
+                }
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -1090,6 +1372,7 @@ private fun Preview_AppScreen() {
                 downloadProgress = .50f,
                 hasPartialDownload = false,
                 isUpdatePending = false,
+                downloadInfo = null,
                 onDownloadInstallClick = { isDownloading = !isDownloading },
                 onPauseResumeClick = { },
                 onDeleteDownloadClick = { },
