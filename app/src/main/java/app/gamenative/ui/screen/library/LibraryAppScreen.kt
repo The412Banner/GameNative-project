@@ -447,7 +447,12 @@ internal fun AppScreenContent(
     }
 
     LaunchedEffect(Unit) {
-        playButtonFocusRequester.requestFocus()
+        try {
+            playButtonFocusRequester.requestFocus()
+        } catch (_: IllegalStateException) {
+            // FocusRequester not attached - the PrimaryActionButton may not be
+            // in composition (e.g. non-downloading layout uses regular Buttons)
+        }
     }
 
     // Handle gamepad button presses

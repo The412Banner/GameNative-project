@@ -37,8 +37,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.focusable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -151,6 +154,11 @@ private fun LibraryScreenContent(
         }
     }
 
+    // FocusRequester for the root container to ensure gamepad key events are always dispatched.
+    // Without this, switching to a tab with no items (e.g. LOCAL with no custom games) loses
+    // focus from the tree entirely, and L1/R1 bumper events stop arriving.
+    val rootFocusRequester = remember { FocusRequester() }
+
     var isSystemMenuOpen by remember { mutableStateOf(false) }
     // Keep a stable reference to the selected item so detail view doesn't disappear during list refresh/pagination.
     var selectedLibraryItem by remember { mutableStateOf<LibraryItem?>(null) }
@@ -240,11 +248,23 @@ private fun LibraryScreenContent(
         Modifier
     }
 
+    // Recapture focus on the root container when the tab changes or the list becomes empty,
+    // so bumper key events keep working even when there are no focusable grid items.
+    LaunchedEffect(state.currentTab, state.appInfoList.isEmpty()) {
+        try {
+            rootFocusRequester.requestFocus()
+        } catch (_: IllegalStateException) {
+            // FocusRequester not yet attached during initial composition
+        }
+    }
+
     Box(
         Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .then(safePaddingModifier)
+            .focusRequester(rootFocusRequester)
+            .focusable()
             .onPreviewKeyEvent { keyEvent ->
                 // TODO: consider abstracting this
                 // Handle gamepad buttons

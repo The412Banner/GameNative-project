@@ -95,6 +95,8 @@ fun LibraryTabBar(
             onPreviousTab = onPreviousTab,
             onNextTab = onNextTab,
             onOptionsClick = onOptionsClick,
+            onSearchClick = onSearchClick,
+            onAddGameClick = onAddGameClick,
             onMenuClick = onMenuClick,
             modifier = modifier,
         )
@@ -251,6 +253,8 @@ private fun ExpandedLibraryTabBar(
     onPreviousTab: () -> Unit,
     onNextTab: () -> Unit,
     onOptionsClick: () -> Unit,
+    onSearchClick: () -> Unit,
+    onAddGameClick: () -> Unit,
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -376,6 +380,20 @@ private fun ExpandedLibraryTabBar(
                 label = "R1",
                 onClick = onNextTab,
                 isLeft = false,
+            )
+
+            // Search button
+            IconActionButton(
+                icon = Icons.Default.Search,
+                contentDescription = stringResource(R.string.search),
+                onClick = onSearchClick,
+            )
+
+            // Add game button
+            IconActionButton(
+                icon = Icons.Default.Add,
+                contentDescription = stringResource(R.string.action_add_game),
+                onClick = onAddGameClick,
             )
 
             // Menu button (opens system menu)
