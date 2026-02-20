@@ -225,9 +225,15 @@ fun PluviaMain(
     // Track if connection banner was dismissed by user
     var connectionBannerDismissed by rememberSaveable { mutableStateOf(false) }
 
-    // Reset dismissed state when connection state changes
+    // Track previous connection state to detect actual changes (not just recomposition)
+    val previousConnectionState = remember { mutableStateOf(state.connectionState) }
+
+    // Reset dismissed state only when connection state actually changes
     LaunchedEffect(state.connectionState) {
-        connectionBannerDismissed = false
+        if (previousConnectionState.value != state.connectionState) {
+            connectionBannerDismissed = false
+            previousConnectionState.value = state.connectionState
+        }
     }
 
     // Check for updates on app start
