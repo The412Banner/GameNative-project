@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -156,6 +157,8 @@ private fun LibraryScreenContent(
 
     val rootFocusRequester = remember { FocusRequester() }
     val gridFirstItemFocusRequester = remember { FocusRequester() }
+    var gridFocusTargetListIndex by remember { mutableIntStateOf(0) }
+    var pendingGridFocusRequest by remember { mutableStateOf(false) }
 
     var isSystemMenuOpen by remember { mutableStateOf(false) }
     // Keep a stable reference to the selected item so detail view doesn't disappear during list refresh/pagination.
@@ -266,6 +269,17 @@ private fun LibraryScreenContent(
             } catch (_: IllegalStateException) {
                 // FocusRequester not yet attached during initial composition
             }
+        }
+    }
+
+    LaunchedEffect(pendingGridFocusRequest, gridFocusTargetListIndex, state.appInfoList.size) {
+        if (pendingGridFocusRequest && state.appInfoList.isNotEmpty()) {
+            try {
+                gridFirstItemFocusRequester.requestFocus()
+            } catch (_: IllegalStateException) {
+                // FocusRequester not yet attached during recomposition
+            }
+            pendingGridFocusRequest = false
         }
     }
 
@@ -381,6 +395,7 @@ private fun LibraryScreenContent(
                     listState = listState,
                     currentLayout = currentPaneType,
                     firstGridItemFocusRequester = gridFirstItemFocusRequester,
+                    focusTargetListIndex = gridFocusTargetListIndex,
                     onPageChange = onPageChange,
                     onNavigate = { appId -> selectedAppId = appId
                         selectedLibraryItem = state.appInfoList.find { it.appId == appId }  },
@@ -421,11 +436,9 @@ private fun LibraryScreenContent(
                         onMenuClick = { isSystemMenuOpen = true },
                         onNavigateDownToGrid = {
                             if (state.appInfoList.isNotEmpty()) {
-                                try {
-                                    gridFirstItemFocusRequester.requestFocus()
-                                } catch (_: IllegalStateException) {
-                                    // FocusRequester not attached yet
-                                }
+                                gridFocusTargetListIndex = listState.firstVisibleItemIndex
+                                    .coerceIn(0, state.appInfoList.lastIndex)
+                                pendingGridFocusRequest = true
                             }
                         },
                         modifier = Modifier

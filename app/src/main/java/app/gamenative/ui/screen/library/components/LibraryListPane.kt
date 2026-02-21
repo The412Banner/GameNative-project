@@ -65,6 +65,7 @@ internal fun LibraryListPane(
     listState: LazyGridState,
     currentLayout: PaneType,
     firstGridItemFocusRequester: FocusRequester? = null,
+    focusTargetListIndex: Int? = null,
     onPageChange: (Int) -> Unit,
     onNavigate: (String) -> Unit,
     onRefresh: () -> Unit,
@@ -184,8 +185,11 @@ internal fun LibraryListPane(
                                 bottom = 72.dp,
                             ),
                         ) {
-                            val firstVisibleAppId = state.appInfoList.firstOrNull()?.appId
-                            items(items = state.appInfoList, key = { it.index }) { item ->
+                            items(
+                                count = state.appInfoList.size,
+                                key = { listIndex -> state.appInfoList[listIndex].index },
+                            ) { listIndex ->
+                                val item = state.appInfoList[listIndex]
                                 var isVisible by remember(item.index) { mutableStateOf(false) }
                                 val alpha by animateFloatAsState(
                                     targetValue = if (isVisible) 1f else 0f,
@@ -203,7 +207,8 @@ internal fun LibraryListPane(
 
                                 Box(modifier = Modifier.alpha(alpha)) {
                                     val appItemModifier = if (firstGridItemFocusRequester != null &&
-                                        item.appId == firstVisibleAppId
+                                        focusTargetListIndex != null &&
+                                        listIndex == focusTargetListIndex
                                     ) {
                                         Modifier.focusRequester(firstGridItemFocusRequester)
                                     } else {
