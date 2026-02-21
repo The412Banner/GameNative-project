@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
@@ -199,22 +200,26 @@ private fun PrimaryActionButton(
         if (isDownloading) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Box(modifier = Modifier.width(100.dp)) {
-                    LinearProgressIndicator(
-                        progress = { downloadProgress },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(4.dp)
-                            .clip(RoundedCornerShape(2.dp)),
-                        color = Color.White,
-                        trackColor = Color.White.copy(alpha = 0.3f),
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.Pause,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(16.dp),
+                )
+                LinearProgressIndicator(
+                    progress = { downloadProgress },
+                    modifier = Modifier
+                        .width(80.dp)
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(2.dp)),
+                    color = Color.White,
+                    trackColor = Color.White.copy(alpha = 0.3f),
+                )
                 Text(
                     text = "${(downloadProgress * 100).toInt()}%",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
                     color = Color.White,
                 )
             }
@@ -451,6 +456,37 @@ internal fun AppScreenContent(
         installEnabled && isValidToDownload
     }
 
+    // Download progress texts hoisted here so they can be shown inside the button
+    val downloadStatusMessageFlow = remember(downloadInfo) { downloadInfo?.getStatusMessageFlow() }
+    val downloadStatusMessage by (
+        downloadStatusMessageFlow?.collectAsState(initial = downloadStatusMessageFlow.value)
+            ?: remember { mutableStateOf<String?>(null) }
+    )
+    val downloadingLabel = stringResource(R.string.downloading)
+    val downloadTimeLeftText = remember(displayInfo.appId, downloadProgress, downloadInfo, downloadStatusMessage) {
+        val etaMs = downloadInfo?.getEstimatedTimeRemaining()
+        if (etaMs != null && etaMs > 0L) {
+            val totalSeconds = etaMs / 1000
+            val minutesLeft = totalSeconds / 60
+            val secondsPart = totalSeconds % 60
+            "${minutesLeft}m ${secondsPart}s left"
+        } else if (downloadProgress in 0f..1f && downloadProgress < 1f) {
+            downloadStatusMessage?.takeUnless { it.isBlank() } ?: ""
+        } else {
+            ""
+        }
+    }
+    val downloadSizeText = remember(displayInfo.gameId, downloadProgress, downloadInfo) {
+        val (bytesDone, bytesTotal) = downloadInfo?.getBytesProgress() ?: (0L to 0L)
+        if (bytesTotal > 0L) {
+            "${formatBytes(bytesDone)} / ${formatBytes(bytesTotal)}"
+        } else if (bytesDone > 0L) {
+            formatBytes(bytesDone)
+        } else {
+            downloadingLabel
+        }
+    }
+
     // Handle gamepad button presses
     val handleKeyEvent: (KeyEvent) -> Boolean = { event ->
         if (event.action == KeyEvent.ACTION_DOWN) {
@@ -667,7 +703,37 @@ internal fun AppScreenContent(
                             )
                         }
 
-                        Spacer(modifier = Modifier.weight(1f))
+                        // Download size / ETA text lives here so it can reflow
+                        // freely without affecting the fixed-width button
+                        if (isDownloading) {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(horizontal = 8.dp),
+                                verticalArrangement = Arrangement.Center,
+                            ) {
+                                if (downloadSizeText.isNotEmpty()) {
+                                    Text(
+                                        text = downloadSizeText,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color.White.copy(alpha = 0.9f),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                }
+                                if (downloadTimeLeftText.isNotEmpty()) {
+                                    Text(
+                                        text = downloadTimeLeftText,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = Color.White.copy(alpha = 0.65f),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                }
+                            }
+                        } else {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
 
                         // Secondary action icons (right-aligned)
                         ActionIconButton(
@@ -714,94 +780,6 @@ internal fun AppScreenContent(
                     .background(MaterialTheme.colorScheme.background)
                     .padding(20.dp),
             ) {
-                // Download progress section
-                if (isDownloading) {
-                    // downloadInfo passed from BaseAppScreen based on game source
-                    val statusMessageFlow = downloadInfo?.getStatusMessageFlow()
-                    val statusMessageState = statusMessageFlow?.collectAsState(initial = statusMessageFlow.value)
-                    val statusMessage = statusMessageState?.value
-
-                    val timeLeftText = remember(displayInfo.appId, downloadProgress, downloadInfo, statusMessage) {
-                        val etaMs = downloadInfo?.getEstimatedTimeRemaining()
-                        if (etaMs != null && etaMs > 0L) {
-                            val totalSeconds = etaMs / 1000
-                            val minutesLeft = totalSeconds / 60
-                            val secondsPart = totalSeconds % 60
-                            "${minutesLeft}m ${secondsPart}s left"
-                        } else if (downloadProgress in 0f..1f && downloadProgress < 1f) {
-                            statusMessage?.takeUnless { it.isBlank() } ?: "Calculating..."
-                        } else {
-                            ""
-                        }
-                    }
-
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.installation_progress),
-                                    style = MaterialTheme.typography.titleSmall,
-                                )
-                                Text(
-                                    text = "${(downloadProgress * 100f).toInt()}%",
-                                    style = MaterialTheme.typography.titleSmall,
-                                    color = MaterialTheme.colorScheme.primary,
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            LinearProgressIndicator(
-                                progress = { downloadProgress },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(6.dp)
-                                    .clip(RoundedCornerShape(3.dp)),
-                                color = MaterialTheme.colorScheme.primary,
-                                trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            val downloadingText = stringResource(R.string.downloading)
-                            val sizeText = remember(displayInfo.gameId, downloadProgress, downloadInfo) {
-                                val (bytesDone, bytesTotal) = downloadInfo?.getBytesProgress() ?: (0L to 0L)
-                                if (bytesTotal > 0L) {
-                                    "${formatBytes(bytesDone)} / ${formatBytes(bytesTotal)}"
-                                } else if (bytesDone > 0L) {
-                                    formatBytes(bytesDone)
-                                } else {
-                                    downloadingText
-                                }
-                            }
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                            ) {
-                                Text(
-                                    text = sizeText,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                                Text(
-                                    text = timeLeftText,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-
                 // Update available banner
                 if (isUpdatePending) {
                     Surface(
