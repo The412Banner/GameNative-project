@@ -1,6 +1,5 @@
 package app.gamenative.ui.screen.settings
 
-import androidx.compose.foundation.background
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material3.Icon
@@ -10,8 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import app.gamenative.Constants
@@ -26,10 +23,7 @@ import com.alorma.compose.settings.ui.SettingsSwitch
 
 @Composable
 fun SettingsGroupInfo() {
-    SettingsGroup(
-        modifier = Modifier.background(Color.Transparent),
-        title = { Text(text = stringResource(R.string.settings_info_title)) }
-    ) {
+    SettingsGroup(title = { Text(text = stringResource(R.string.settings_info_title)) }) {
         val uriHandler = LocalUriHandler.current
         var askForTip by rememberSaveable { mutableStateOf(!PrefManager.tipped) }
         var showLibrariesDialog by rememberSaveable { mutableStateOf(false) }
