@@ -47,6 +47,7 @@ import app.gamenative.enums.SaveLocation
 import app.gamenative.enums.SyncResult
 import app.gamenative.events.AndroidEvent
 import app.gamenative.service.SteamService
+import app.gamenative.service.amazon.AmazonService
 import app.gamenative.ui.component.ConnectionStatusBanner
 import app.gamenative.service.epic.EpicService
 import app.gamenative.service.gog.GOGService
@@ -68,8 +69,10 @@ import app.gamenative.ui.screen.login.UserLoginScreen
 import app.gamenative.ui.screen.settings.SettingsScreen
 import app.gamenative.ui.screen.xserver.XServerScreen
 import app.gamenative.ui.theme.PluviaTheme
+import app.gamenative.utils.BestConfigService
 import app.gamenative.utils.ContainerUtils
 import app.gamenative.utils.CustomGameScanner
+import app.gamenative.utils.ManifestInstaller
 import app.gamenative.utils.GameFeedbackUtils
 import app.gamenative.utils.IntentLaunchManager
 import app.gamenative.utils.UpdateChecker
@@ -89,6 +92,8 @@ import java.util.Date
 import java.util.EnumSet
 import kotlin.reflect.KFunction2
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -139,6 +144,10 @@ private fun resolveGameAppId(appId: String): GameResolutionResult {
             EpicService.isGameInstalled(gameId)
         }
 
+        GameSource.AMAZON -> {
+            AmazonService.isGameInstalledByAppId(gameId)
+        }
+
         GameSource.CUSTOM_GAME -> {
             CustomGameScanner.isGameInstalled(gameId)
         }
@@ -167,6 +176,7 @@ private fun resolveNotInstalledGameName(context: Context, appId: String, gameId:
         GameSource.STEAM -> SteamService.getAppInfoOf(gameId)?.name
         GameSource.GOG -> GOGService.getGOGGameOf(gameId.toString())?.title
         GameSource.EPIC -> EpicService.getEpicGameOf(gameId)?.title
+        GameSource.AMAZON -> null // Amazon game title lookup requires suspend, use fallback
         GameSource.CUSTOM_GAME -> {
             val customAppId = "${GameSource.CUSTOM_GAME.name}_$gameId"
             CustomGameScanner.getFolderPathFromAppId(customAppId)
@@ -502,6 +512,14 @@ fun PluviaMain(
             ) {
                 Timber.d("[PluviaMain]: Starting EpicService for logged-in user")
                 app.gamenative.service.epic.EpicService.start(context)
+            }
+
+            // Start AmazonService if user has Amazon credentials
+            if (AmazonService.hasStoredCredentials(context) &&
+                !AmazonService.isRunning
+            ) {
+                Timber.d("[PluviaMain]: Starting AmazonService for logged-in user")
+                AmazonService.start(context)
             }
 
             // Handle navigation when already logged in (e.g., app resumed with active session)
@@ -1227,6 +1245,7 @@ fun preLaunchApp(
                 GameSource.GOG -> GOGService.getLaunchExecutable(appId, container)
                 GameSource.EPIC -> EpicService.getLaunchExecutable(appId)
                 GameSource.CUSTOM_GAME -> CustomGameScanner.getLaunchExecutable(container)
+                GameSource.AMAZON -> AmazonService.getLaunchExecutable(appId)
             }
             if (effectiveExe.isBlank()) {
                 Timber.tag("preLaunchApp").w("Cannot launch $appId: no executable found (game source: $gameSource)")
@@ -1241,6 +1260,30 @@ fun preLaunchApp(
                         actionBtnText = AppOptionMenuType.EditContainer.text,
                     ),
                 )
+                return@launch
+            }
+        }
+
+        // download any manifest components (wine/proton, dxvk, etc.) missing from config
+        if (gameSource == GameSource.STEAM) {
+            try {
+                val configJson = Json.parseToJsonElement(container.containerJson).jsonObject
+                val missingRequests = BestConfigService.resolveMissingManifestInstallRequests(
+                    context, configJson, "exact_gpu_match",
+                )
+                for (request in missingRequests) {
+                    setLoadingMessage(context.getString(R.string.main_downloading_entry, request.entry.name))
+                    try {
+                        ManifestInstaller.installManifestEntry(
+                            context, request.entry, request.isDriver, request.contentType,
+                        ) { progress -> setLoadingProgress(progress.coerceIn(0f, 1f)) }
+                    } catch (e: Exception) {
+                        Timber.e(e, "Failed to install ${request.entry.name}, continuing")
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to install manifest components")
+                setLoadingDialogVisible(false)
                 return@launch
             }
         }
@@ -1366,6 +1409,7 @@ fun preLaunchApp(
                 "steam-token.tzst",
             ).await()
         }
+
         val loadingMessage = if (container.containerVariant.equals(Container.GLIBC)) {
             context.getString(R.string.main_installing_glibc)
         } else {
@@ -1433,6 +1477,15 @@ fun preLaunchApp(
                 Timber.tag("GOG").i("[Cloud Saves] Download sync completed successfully for $appId")
             }
 
+            setLoadingDialogVisible(false)
+            onSuccess(context, appId)
+            return@launch
+        }
+
+        // For Amazon Games, skip cloud sync entirely (Amazon doesn't support cloud saves)
+        val isAmazonGame = gameSource == GameSource.AMAZON
+        if (isAmazonGame) {
+            Timber.tag("preLaunchApp").i("Amazon Game detected for $appId — skipping cloud sync and launching container")
             setLoadingDialogVisible(false)
             onSuccess(context, appId)
             return@launch
