@@ -44,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -165,6 +166,9 @@ private fun LibraryScreenContent(
     var pendingCarouselFocusRequest by remember { mutableStateOf(false) }
 
     var isSystemMenuOpen by remember { mutableStateOf(false) }
+    // Track previous overlay states to detect when they close
+    var wasSystemMenuOpen by remember { mutableStateOf(false) }
+    var wasOptionsPanelOpen by remember { mutableStateOf(false) }
     // Keep a stable reference to the selected item so detail view doesn't disappear during list refresh/pagination.
     var selectedLibraryItem by remember { mutableStateOf<LibraryItem?>(null) }
     val filterFabExpanded by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
@@ -307,6 +311,38 @@ private fun LibraryScreenContent(
         }
     }
 
+    // Restore focus when System Menu or Options Panel closes
+    LaunchedEffect(isSystemMenuOpen, state.isOptionsPanelOpen) {
+        val systemMenuJustClosed = wasSystemMenuOpen && !isSystemMenuOpen
+        val optionsPanelJustClosed = wasOptionsPanelOpen && !state.isOptionsPanelOpen
+
+        if (systemMenuJustClosed || optionsPanelJustClosed) {
+            // Give a brief moment for the overlay to animate out
+            kotlinx.coroutines.delay(50)
+            // Restore focus to carousel or grid based on current layout
+            if (state.appInfoList.isNotEmpty()) {
+                if (currentPaneType == PaneType.CAROUSEL) {
+                    try {
+                        carouselFocusRequester.requestFocus()
+                    } catch (_: IllegalStateException) {}
+                } else {
+                    try {
+                        gridFirstItemFocusRequester.requestFocus()
+                    } catch (_: IllegalStateException) {}
+                }
+            } else {
+                // Empty list - focus root so bumpers still work
+                try {
+                    rootFocusRequester.requestFocus()
+                } catch (_: IllegalStateException) {}
+            }
+        }
+
+        // Update previous state trackers
+        wasSystemMenuOpen = isSystemMenuOpen
+        wasOptionsPanelOpen = state.isOptionsPanelOpen
+    }
+
     Box(
         Modifier
             .fillMaxSize()
@@ -404,6 +440,49 @@ private fun LibraryScreenContent(
                             }
                         }
 
+                        else -> false
+                    }
+                } else {
+                    false
+                }
+            }
+            // Fallback: if D-pad/stick wasn't consumed, restore focus to content
+            .onKeyEvent { keyEvent ->
+                if (keyEvent.nativeKeyEvent.action == KeyEvent.ACTION_DOWN &&
+                    selectedAppId == null && !isSystemMenuOpen && !state.isOptionsPanelOpen
+                ) {
+                    when (keyEvent.nativeKeyEvent.keyCode) {
+                        KeyEvent.KEYCODE_DPAD_UP,
+                        KeyEvent.KEYCODE_DPAD_DOWN,
+                        KeyEvent.KEYCODE_DPAD_LEFT,
+                        KeyEvent.KEYCODE_DPAD_RIGHT,
+                        -> {
+                            // D-pad event wasn't consumed by any child - focus was lost
+                            // Restore focus immediately to appropriate content
+                            if (state.appInfoList.isNotEmpty()) {
+                                if (currentPaneType == PaneType.CAROUSEL) {
+                                    try {
+                                        carouselFocusRequester.requestFocus()
+                                    } catch (_: IllegalStateException) {
+                                        pendingCarouselFocusRequest = true
+                                    }
+                                } else {
+                                    gridFocusTargetListIndex = listState.firstVisibleItemIndex
+                                        .coerceIn(0, state.appInfoList.lastIndex)
+                                    try {
+                                        gridFirstItemFocusRequester.requestFocus()
+                                    } catch (_: IllegalStateException) {
+                                        pendingGridFocusRequest = true
+                                    }
+                                }
+                            } else {
+                                try {
+                                    rootFocusRequester.requestFocus()
+                                } catch (_: IllegalStateException) {}
+                            }
+                            // Return true - focus is now restored, next D-pad will work
+                            true
+                        }
                         else -> false
                     }
                 } else {
