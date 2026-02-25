@@ -3,6 +3,8 @@ package app.gamenative.ui.screen.library.components
 import android.view.KeyEvent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.focusable
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -114,6 +116,7 @@ internal fun LibraryCarouselPane(
     onNavigate: (String) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
+    carouselFocusRequester: FocusRequester? = null,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val pullToRefreshState = rememberPullToRefreshState()
@@ -225,6 +228,13 @@ internal fun LibraryCarouselPane(
                         else -> false
                     }
                 }
+                .then(
+                    if (carouselFocusRequester != null) {
+                        Modifier.focusRequester(carouselFocusRequester)
+                    } else {
+                        Modifier
+                    }
+                )
                 .focusable(),
         ) {
             Box(modifier = Modifier.fillMaxSize()) {

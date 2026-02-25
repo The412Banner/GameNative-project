@@ -159,8 +159,10 @@ private fun LibraryScreenContent(
 
     val rootFocusRequester = remember { FocusRequester() }
     val gridFirstItemFocusRequester = remember { FocusRequester() }
+    val carouselFocusRequester = remember { FocusRequester() }
     var gridFocusTargetListIndex by remember { mutableIntStateOf(0) }
     var pendingGridFocusRequest by remember { mutableStateOf(false) }
+    var pendingCarouselFocusRequest by remember { mutableStateOf(false) }
 
     var isSystemMenuOpen by remember { mutableStateOf(false) }
     // Keep a stable reference to the selected item so detail view doesn't disappear during list refresh/pagination.
@@ -285,6 +287,17 @@ private fun LibraryScreenContent(
         }
     }
 
+    LaunchedEffect(pendingCarouselFocusRequest, state.appInfoList.size) {
+        if (pendingCarouselFocusRequest && state.appInfoList.isNotEmpty()) {
+            try {
+                carouselFocusRequester.requestFocus()
+            } catch (_: IllegalStateException) {
+                // FocusRequester not yet attached during recomposition
+            }
+            pendingCarouselFocusRequest = false
+        }
+    }
+
     Box(
         Modifier
             .fillMaxSize()
@@ -404,6 +417,7 @@ private fun LibraryScreenContent(
                         },
                         onRefresh = onRefresh,
                         modifier = Modifier.fillMaxSize(),
+                        carouselFocusRequester = carouselFocusRequester,
                     )
                 } else {
                     LibraryListPane(
@@ -455,9 +469,13 @@ private fun LibraryScreenContent(
                         onMenuClick = { isSystemMenuOpen = true },
                         onNavigateDownToGrid = {
                             if (state.appInfoList.isNotEmpty()) {
-                                gridFocusTargetListIndex = listState.firstVisibleItemIndex
-                                    .coerceIn(0, state.appInfoList.lastIndex)
-                                pendingGridFocusRequest = true
+                                if (currentPaneType == PaneType.CAROUSEL) {
+                                    pendingCarouselFocusRequest = true
+                                } else {
+                                    gridFocusTargetListIndex = listState.firstVisibleItemIndex
+                                        .coerceIn(0, state.appInfoList.lastIndex)
+                                    pendingGridFocusRequest = true
+                                }
                             }
                         },
                         modifier = Modifier
