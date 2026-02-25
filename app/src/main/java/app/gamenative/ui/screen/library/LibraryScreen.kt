@@ -264,18 +264,24 @@ private fun LibraryScreenContent(
 
     // Recapture focus on the root container when the list becomes empty (e.g. switching to
     // an empty tab), so bumper key events keep working even when there are no grid items.
-    // Include currentTab as a key so switching between empty tabs (e.g. GoG→Epic) still
-    // recaptures focus. Add a small delay to ensure composition is complete before requesting.
-    // TODO: This fix is incomplete - R1/L1 still stops working at empty tabs like GoG.
-    // Need deeper investigation into focus system behavior when carousel/list has no items.
-    LaunchedEffect(state.appInfoList.isEmpty(), state.currentTab) {
+    // Use currentTab as a key to ensure focus is recaptured on EVERY tab change when empty.
+    // Request focus multiple times with increasing delays to handle race conditions.
+    LaunchedEffect(state.currentTab) {
         if (state.appInfoList.isEmpty()) {
+            // Request focus immediately
+            try {
+                rootFocusRequester.requestFocus()
+            } catch (_: IllegalStateException) {}
+            // Request again after a short delay to handle composition timing
             kotlinx.coroutines.delay(50)
             try {
                 rootFocusRequester.requestFocus()
-            } catch (_: IllegalStateException) {
-                // FocusRequester not yet attached during initial composition
-            }
+            } catch (_: IllegalStateException) {}
+            // Final attempt after longer delay
+            kotlinx.coroutines.delay(100)
+            try {
+                rootFocusRequester.requestFocus()
+            } catch (_: IllegalStateException) {}
         }
     }
 
@@ -481,6 +487,8 @@ private fun LibraryScreenContent(
                                 }
                             }
                         },
+                        onPreviousTab = { onTabChanged(state.currentTab.previous()) },
+                        onNextTab = { onTabChanged(state.currentTab.next()) },
                         modifier = Modifier
                             .align(Alignment.TopCenter)
                             .fillMaxWidth(),

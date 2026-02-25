@@ -74,6 +74,8 @@ fun LibraryTabBar(
     onAddGameClick: () -> Unit,
     onMenuClick: () -> Unit,
     onNavigateDownToGrid: () -> Unit,
+    onPreviousTab: () -> Unit = {},
+    onNextTab: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val widthClass = rememberWindowWidthClass()
@@ -88,6 +90,8 @@ fun LibraryTabBar(
             onAddGameClick = onAddGameClick,
             onMenuClick = onMenuClick,
             onNavigateDownToGrid = onNavigateDownToGrid,
+            onPreviousTab = onPreviousTab,
+            onNextTab = onNextTab,
             modifier = modifier,
         )
 
@@ -100,6 +104,8 @@ fun LibraryTabBar(
             onAddGameClick = onAddGameClick,
             onMenuClick = onMenuClick,
             onNavigateDownToGrid = onNavigateDownToGrid,
+            onPreviousTab = onPreviousTab,
+            onNextTab = onNextTab,
             modifier = modifier,
         )
     }
@@ -119,6 +125,8 @@ private fun CompactLibraryTabBar(
     onAddGameClick: () -> Unit,
     onMenuClick: () -> Unit,
     onNavigateDownToGrid: () -> Unit,
+    onPreviousTab: () -> Unit,
+    onNextTab: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val tabs = LibraryTab.entries
@@ -142,11 +150,22 @@ private fun CompactLibraryTabBar(
                 .fillMaxWidth()
                 .focusGroup()
                 .onPreviewKeyEvent { keyEvent ->
-                    if (keyEvent.nativeKeyEvent.action == KeyEvent.ACTION_DOWN &&
-                        keyEvent.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_DPAD_DOWN
-                    ) {
-                        onNavigateDownToGrid()
-                        true
+                    if (keyEvent.nativeKeyEvent.action == KeyEvent.ACTION_DOWN) {
+                        when (keyEvent.nativeKeyEvent.keyCode) {
+                            KeyEvent.KEYCODE_DPAD_DOWN -> {
+                                onNavigateDownToGrid()
+                                true
+                            }
+                            KeyEvent.KEYCODE_BUTTON_L1 -> {
+                                onPreviousTab()
+                                true
+                            }
+                            KeyEvent.KEYCODE_BUTTON_R1 -> {
+                                onNextTab()
+                                true
+                            }
+                            else -> false
+                        }
                     } else {
                         false
                     }
@@ -315,6 +334,8 @@ private fun ExpandedLibraryTabBar(
     onAddGameClick: () -> Unit,
     onMenuClick: () -> Unit,
     onNavigateDownToGrid: () -> Unit,
+    onPreviousTab: () -> Unit,
+    onNextTab: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val tabs = LibraryTab.entries
@@ -365,11 +386,22 @@ private fun ExpandedLibraryTabBar(
                 .padding(horizontal = 12.dp)
                 .focusGroup()
                 .onPreviewKeyEvent { keyEvent ->
-                    if (keyEvent.nativeKeyEvent.action == KeyEvent.ACTION_DOWN &&
-                        keyEvent.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_DPAD_DOWN
-                    ) {
-                        onNavigateDownToGrid()
-                        true
+                    if (keyEvent.nativeKeyEvent.action == KeyEvent.ACTION_DOWN) {
+                        when (keyEvent.nativeKeyEvent.keyCode) {
+                            KeyEvent.KEYCODE_DPAD_DOWN -> {
+                                onNavigateDownToGrid()
+                                true
+                            }
+                            KeyEvent.KEYCODE_BUTTON_L1 -> {
+                                onPreviousTab()
+                                true
+                            }
+                            KeyEvent.KEYCODE_BUTTON_R1 -> {
+                                onNextTab()
+                                true
+                            }
+                            else -> false
+                        }
                     } else {
                         false
                     }
