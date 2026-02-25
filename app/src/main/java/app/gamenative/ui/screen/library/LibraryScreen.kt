@@ -264,9 +264,10 @@ private fun LibraryScreenContent(
 
     // Recapture focus on the root container when the list becomes empty (e.g. switching to
     // an empty tab), so bumper key events keep working even when there are no grid items.
-    // NOTE: Do NOT trigger on state.currentTab — that steals focus from whichever tab bar
-    // button the user just navigated to and causes the "flash" / "reset to hamburger" bug.
-    LaunchedEffect(state.appInfoList.isEmpty()) {
+    // Include currentTab as a key so switching between empty tabs (e.g. GoG→Epic) still
+    // recaptures focus. The focus steal mentioned in the old comment only applies to D-pad
+    // navigation of the tab bar, not bumper-initiated tab changes.
+    LaunchedEffect(state.appInfoList.isEmpty(), state.currentTab) {
         if (state.appInfoList.isEmpty()) {
             try {
                 rootFocusRequester.requestFocus()
