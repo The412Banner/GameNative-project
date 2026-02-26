@@ -3046,12 +3046,20 @@ class SteamService : Service(), IChallengeUrlChanged {
                     val avatarHash = callback.avatarHash.toHexString()
                     val playerName = callback.playerName
 
+                    // When connected, callback may return Offline due to missing Status flag in request.
+                    // Trust PrefManager.personaState (user's chosen state) in that case.
+                    val state = if (callback.personaState == EPersonaState.Offline && isConnected) {
+                        PrefManager.personaState
+                    } else {
+                        callback.personaState
+                    }
+
                     // Update local state flow
                     _localPersona.update {
                         it.copy(
                             avatarHash = avatarHash,
                             name = playerName,
-                            state = callback.personaState,
+                            state = state,
                             gameAppID = callback.gamePlayedAppId,
                             gameName = appDao.findApp(callback.gamePlayedAppId)?.name ?: callback.gameName,
                         )

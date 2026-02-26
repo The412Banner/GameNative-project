@@ -259,6 +259,7 @@ fun SystemMenu(
     var showStatusPicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
+        persona = SteamService.instance?.localPersona?.value
         SteamService.userSteamId?.let {
             SteamService.requestUserPersona()
         }
