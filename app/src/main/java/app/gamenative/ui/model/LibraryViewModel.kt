@@ -26,6 +26,9 @@ import app.gamenative.service.SteamService
 import app.gamenative.service.amazon.AmazonService
 import app.gamenative.ui.data.LibraryState
 import app.gamenative.ui.enums.AppFilter
+import app.gamenative.ui.enums.LibraryTab
+import app.gamenative.ui.enums.LibraryTab.Companion.next
+import app.gamenative.ui.enums.LibraryTab.Companion.previous
 import app.gamenative.ui.enums.SortOption
 import app.gamenative.utils.CustomGameScanner
 import app.gamenative.utils.GameCompatibilityCache
@@ -222,9 +225,27 @@ class LibraryViewModel @Inject constructor(
         _state.update { it.copy(isOptionsPanelOpen = isOpen) }
     }
 
-    fun onTabChanged(tab: app.gamenative.ui.enums.LibraryTab) {
+    fun onTabChanged(tab: LibraryTab) {
         _state.update { it.copy(currentTab = tab) }
         onFilterApps(0) // Reset to first page and refresh
+    }
+
+    fun onNextTab() {
+        _state.update { currentState ->
+            val nextTab = currentState.currentTab.next()
+            Timber.tag("LibraryViewModel").d("Tab next via bumper: ${currentState.currentTab} -> $nextTab")
+            currentState.copy(currentTab = nextTab)
+        }
+        onFilterApps(0)
+    }
+
+    fun onPreviousTab() {
+        _state.update { currentState ->
+            val previousTab = currentState.currentTab.previous()
+            Timber.tag("LibraryViewModel").d("Tab previous via bumper: ${currentState.currentTab} -> $previousTab")
+            currentState.copy(currentTab = previousTab)
+        }
+        onFilterApps(0)
     }
 
     fun onSearchQuery(value: String) {

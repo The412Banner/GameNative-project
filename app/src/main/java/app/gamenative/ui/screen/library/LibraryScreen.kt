@@ -72,8 +72,6 @@ import app.gamenative.ui.components.requestPermissionsForPath
 import app.gamenative.ui.data.LibraryState
 import app.gamenative.ui.enums.AppFilter
 import app.gamenative.ui.enums.LibraryTab
-import app.gamenative.ui.enums.LibraryTab.Companion.next
-import app.gamenative.ui.enums.LibraryTab.Companion.previous
 import app.gamenative.ui.enums.PaneType
 import app.gamenative.ui.enums.SortOption
 import app.gamenative.ui.internal.fakeAppInfo
@@ -122,6 +120,8 @@ fun HomeLibraryScreen(
         onSortOptionChanged = viewModel::onSortOptionChanged,
         onOptionsPanelToggle = viewModel::onOptionsPanelToggle,
         onTabChanged = viewModel::onTabChanged,
+        onPreviousTab = viewModel::onPreviousTab,
+        onNextTab = viewModel::onNextTab,
         isOffline = isOffline,
     )
 }
@@ -148,6 +148,8 @@ private fun LibraryScreenContent(
     onSortOptionChanged: (SortOption) -> Unit,
     onOptionsPanelToggle: (Boolean) -> Unit,
     onTabChanged: (LibraryTab) -> Unit,
+    onPreviousTab: () -> Unit,
+    onNextTab: () -> Unit,
     isOffline: Boolean = false,
 ) {
     val context = LocalContext.current
@@ -349,10 +351,15 @@ private fun LibraryScreenContent(
     ) {
         val currentCount = state.appInfoList.size
         val listBecameNonEmpty = previousAppCount == 0 && currentCount > 0
+        val listBecameEmpty = previousAppCount > 0 && currentCount == 0
 
         if (listBecameNonEmpty && selectedAppId == null && !isSystemMenuOpen && !state.isOptionsPanelOpen && !state.isSearching) {
             gridFocusTargetListIndex = listState.firstVisibleItemIndex.coerceIn(0, state.appInfoList.lastIndex)
             requestGridFocusOrDefer()
+        }
+        if (listBecameEmpty && selectedAppId == null && !isSystemMenuOpen && !state.isOptionsPanelOpen && !state.isSearching) {
+            // Empty tabs can drop focused children; re-anchor focus at the root so bumper nav keeps working.
+            requestRootFocusSafe()
         }
 
         previousAppCount = currentCount
@@ -394,7 +401,7 @@ private fun LibraryScreenContent(
         state.appInfoList.size,
         state.currentTab,
     ) {
-        val canBootstrap: () -> Boolean = {
+        val canBootstrapGridFocus: () -> Boolean = {
             val now = SystemClock.uptimeMillis()
             selectedAppId == null &&
                 !isSystemMenuOpen &&
@@ -405,13 +412,40 @@ private fun LibraryScreenContent(
                 !rootHasFocus &&
                 (now - lastBootstrapAtMs) > 250L
         }
+        val canNavigateTabsWithoutFocus: () -> Boolean = {
+            selectedAppId == null &&
+                !isSystemMenuOpen &&
+                !state.isOptionsPanelOpen &&
+                !state.isSearching &&
+                !rootHasFocus
+        }
 
         val onGlobalKeyEvent: (AndroidEvent.KeyEvent) -> Boolean = { androidEvent ->
             val event = androidEvent.event
-            if (event.action != KeyEvent.ACTION_DOWN || !canBootstrap()) {
+            if (event.action != KeyEvent.ACTION_DOWN) {
                 false
             } else {
                 when (event.keyCode) {
+                    KeyEvent.KEYCODE_BUTTON_L1 -> {
+                        if (canNavigateTabsWithoutFocus()) {
+                            onPreviousTab()
+                            requestRootFocusSafe()
+                            true
+                        } else {
+                            false
+                        }
+                    }
+
+                    KeyEvent.KEYCODE_BUTTON_R1 -> {
+                        if (canNavigateTabsWithoutFocus()) {
+                            onNextTab()
+                            requestRootFocusSafe()
+                            true
+                        } else {
+                            false
+                        }
+                    }
+
                     KeyEvent.KEYCODE_DPAD_UP,
                     KeyEvent.KEYCODE_DPAD_DOWN,
                     KeyEvent.KEYCODE_DPAD_LEFT,
@@ -421,11 +455,15 @@ private fun LibraryScreenContent(
                     KeyEvent.KEYCODE_BUTTON_THUMBL,
                     KeyEvent.KEYCODE_BUTTON_THUMBR,
                     -> {
-                        gridFocusTargetListIndex = listState.firstVisibleItemIndex
-                            .coerceIn(0, state.appInfoList.lastIndex)
-                        requestGridFocusOrDefer()
-                        // Do not consume: let normal key routing continue after bootstrap.
-                        false
+                        if (canBootstrapGridFocus()) {
+                            gridFocusTargetListIndex = listState.firstVisibleItemIndex
+                                .coerceIn(0, state.appInfoList.lastIndex)
+                            requestGridFocusOrDefer()
+                            // Do not consume: let normal key routing continue after bootstrap.
+                            false
+                        } else {
+                            false
+                        }
                     }
 
                     else -> false
@@ -435,7 +473,7 @@ private fun LibraryScreenContent(
 
         val onGlobalMotionEvent: (AndroidEvent.MotionEvent) -> Boolean = { androidEvent ->
             val event = androidEvent.event
-            if (event == null || !canBootstrap()) {
+            if (event == null || !canBootstrapGridFocus()) {
                 false
             } else {
                 val isMoveLike = event.actionMasked == MotionEvent.ACTION_MOVE
@@ -526,7 +564,7 @@ private fun LibraryScreenContent(
                                         .coerceIn(0, state.appInfoList.lastIndex)
                                     requestGridFocusOrDefer()
                                 }
-                                onTabChanged(state.currentTab.previous())
+                                onPreviousTab()
                                 true
                             } else {
                                 false
@@ -541,7 +579,7 @@ private fun LibraryScreenContent(
                                         .coerceIn(0, state.appInfoList.lastIndex)
                                     requestGridFocusOrDefer()
                                 }
-                                onTabChanged(state.currentTab.next())
+                                onNextTab()
                                 true
                             } else {
                                 false
@@ -676,8 +714,8 @@ private fun LibraryScreenContent(
                                 pendingGridFocusRequest = true
                             }
                         },
-                        onPreviousTab = { onTabChanged(state.currentTab.previous()) },
-                        onNextTab = { onTabChanged(state.currentTab.next()) },
+                        onPreviousTab = onPreviousTab,
+                        onNextTab = onNextTab,
                         modifier = Modifier
                             .align(Alignment.TopCenter)
                             .fillMaxWidth(),
@@ -905,6 +943,8 @@ private fun Preview_LibraryScreenContent() {
             onTabChanged = { tab ->
                 state = state.copy(currentTab = tab)
             },
+            onPreviousTab = {},
+            onNextTab = {},
         )
     }
 }
