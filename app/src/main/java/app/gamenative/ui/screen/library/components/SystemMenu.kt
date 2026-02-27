@@ -584,8 +584,9 @@ fun SystemMenu(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         if (isOffline) {
+                            val goOnlineLabelRes = if (!SteamService.isLoggedIn) R.string.login_sign_in else R.string.go_online
                             SystemMenuItem(
-                                text = stringResource(R.string.go_online),
+                                text = stringResource(goOnlineLabelRes),
                                 icon = Icons.AutoMirrored.Filled.Login,
                                 onClick = {
                                     onGoOnline()
@@ -597,7 +598,6 @@ fun SystemMenu(
                                 text = stringResource(R.string.go_offline),
                                 icon = Icons.AutoMirrored.Filled.AirplaneTicket,
                                 onClick = {
-                                    SteamService.stop()
                                     onNavigateRoute(PluviaScreen.Home.route + "?offline=true") // TODO: test this
                                     onDismiss()
                                 },

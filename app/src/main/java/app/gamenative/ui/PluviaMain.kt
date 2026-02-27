@@ -487,8 +487,7 @@ fun PluviaMain(
             // Only attempt reconnection if not already connected/connecting and not in offline mode
             val shouldAttemptReconnect = !state.isSteamConnected &&
                 !isConnecting &&
-                !SteamService.keepAlive &&
-                state.connectionState != ConnectionState.OFFLINE_MODE
+                !SteamService.keepAlive
 
             if (shouldAttemptReconnect) {
                 Timber.d("[PluviaMain]: Steam not connected - attempting reconnection")
@@ -1037,7 +1036,7 @@ fun PluviaMain(
         }
 
         // Connection status banner (overlay) - dismissible so users can access navigation
-        if (state.currentScreen != PluviaScreen.LoginUser && !connectionBannerDismissed) {
+        if (state.currentScreen != PluviaScreen.LoginUser && !connectionBannerDismissed && state.connectionState != ConnectionState.OFFLINE_MODE) {
             Box(modifier = Modifier.zIndex(5f)) {
                 ConnectionStatusBanner(
                     connectionState = state.connectionState,
@@ -1077,6 +1076,11 @@ fun PluviaMain(
                     onRetryConnection = viewModel::retryConnection,
                     onContinueOffline = {
                         navController.navigate(PluviaScreen.Home.route + "?offline=true")
+                    },
+                    onPlatformSignedIn = {
+                        navController.navigate(PluviaScreen.Home.route + "?offline=true") {
+                            popUpTo(PluviaScreen.LoginUser.route) { inclusive = true }
+                        }
                     },
                 )
             }
@@ -1140,7 +1144,10 @@ fun PluviaMain(
                         SteamService.logOut()
                     },
                     onGoOnline = {
-                        navController.navigate(PluviaScreen.LoginUser.route)
+                        navController.navigate(
+                            if (!SteamService.isLoggedIn) PluviaScreen.LoginUser.route
+                            else PluviaScreen.Home.route
+                        )
                     },
                     isOffline = isOffline,
                 )

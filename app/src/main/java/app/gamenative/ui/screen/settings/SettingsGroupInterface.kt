@@ -87,160 +87,7 @@ import app.gamenative.ui.screen.auth.GOGOAuthActivity
 import app.gamenative.ui.screen.auth.AmazonOAuthActivity
 import app.gamenative.service.amazon.AmazonAuthManager
 import app.gamenative.service.amazon.AmazonService
-
-/**
- * Shared GOG authentication handler that manages the complete auth flow.
- *
- * @param context Android context for service operations
- * @param authCode The OAuth authorization code
- * @param coroutineScope Coroutine scope for async operations
- * @param onLoadingChange Callback when loading state changes
- * @param onError Callback when an error occurs (receives error message)
- * @param onSuccess Callback when authentication succeeds (receives game count)
- * @param onDialogClose Callback to close the login dialog
- */
-private suspend fun handleGogAuthentication(
-    context: Context,
-    authCode: String,
-    coroutineScope: CoroutineScope,
-    onLoadingChange: (Boolean) -> Unit,
-    onError: (String?) -> Unit,
-    onSuccess: (Int) -> Unit,
-    onDialogClose: () -> Unit
-) {
-    onLoadingChange(true)
-    onError(null)
-
-    try {
-        Timber.d("[SettingsGOG]: Starting authentication...")
-        val result = GOGService.authenticateWithCode(context, authCode)
-
-        if (result.isSuccess) {
-            Timber.i("[SettingsGOG]: ✓ Authentication successful!")
-
-            // Start GOGService and trigger immediate library sync (bypasses throttle)
-            Timber.i("[SettingsGOG]: Starting GOGService and triggering immediate library sync")
-            GOGService.start(context)
-            GOGService.triggerLibrarySync(context)
-
-            // Authentication succeeded - manual sync triggered
-            onSuccess(0)
-            onLoadingChange(false)
-            onDialogClose()
-        } else {
-            val error = result.exceptionOrNull()?.message ?: "Authentication failed"
-            Timber.e("[SettingsGOG]: Authentication failed: $error")
-            onLoadingChange(false)
-            onError(error)
-        }
-    } catch (e: Exception) {
-        Timber.e(e, "[SettingsGOG]: Authentication exception: ${e.message}")
-        onLoadingChange(false)
-        onError(e.message ?: "Authentication failed")
-    }
-}
-
-/**
- * Shared Epic authentication handler that manages the complete auth flow.
- *
- * @param context Android context for service operations
- * @param authCode The OAuth authorization code
- * @param coroutineScope Coroutine scope for async operations
- * @param onLoadingChange Callback when loading state changes
- * @param onError Callback when an error occurs (receives error message)
- * @param onSuccess Callback when authentication succeeds
- * @param onDialogClose Callback to close the login dialog
- */
-private suspend fun handleEpicAuthentication(
-    context: Context,
-    authCode: String,
-    coroutineScope: CoroutineScope,
-    onLoadingChange: (Boolean) -> Unit,
-    onError: (String?) -> Unit,
-    onSuccess: () -> Unit,
-    onDialogClose: () -> Unit
-) {
-    onLoadingChange(true)
-    onError(null)
-
-    try {
-        Timber.d("[SettingsEpic]: Starting authentication...")
-        val result = EpicService.authenticateWithCode(context, authCode)
-
-        if (result.isSuccess) {
-            Timber.i("[SettingsEpic]: ✓ Authentication successful!")
-
-            // Start EpicService and trigger immediate library sync (bypasses throttle)
-            Timber.i("[SettingsEpic]: Starting EpicService and triggering immediate library sync")
-            EpicService.start(context)
-            EpicService.triggerLibrarySync(context)
-
-            onSuccess()
-            onLoadingChange(false)
-            onDialogClose()
-        } else {
-            val error = result.exceptionOrNull()?.message ?: "Authentication failed"
-            Timber.e("[SettingsEpic]: Authentication failed: $error")
-            onLoadingChange(false)
-            onError(error)
-        }
-    } catch (e: Exception) {
-        Timber.e(e, "[SettingsEpic]: Authentication exception: ${e.message}")
-        onLoadingChange(false)
-        onError(e.message ?: "Authentication failed")
-    }
-}
-
-/**
- * Shared Amazon authentication handler that manages the complete auth flow.
- *
- * @param context Android context for service operations
- * @param authCode The OAuth authorization code (PKCE)
- * @param coroutineScope Coroutine scope for async operations
- * @param onLoadingChange Callback when loading state changes
- * @param onError Callback when an error occurs (receives error message)
- * @param onSuccess Callback when authentication succeeds
- * @param onDialogClose Callback to close the login dialog
- */
-private suspend fun handleAmazonAuthentication(
-    context: Context,
-    authCode: String,
-    coroutineScope: CoroutineScope,
-    onLoadingChange: (Boolean) -> Unit,
-    onError: (String?) -> Unit,
-    onSuccess: () -> Unit,
-    onDialogClose: () -> Unit
-) {
-    onLoadingChange(true)
-    onError(null)
-
-    try {
-        Timber.d("[SettingsAmazon]: Starting authentication...")
-        val result = AmazonService.authenticateWithCode(context, authCode)
-
-        if (result.isSuccess) {
-            Timber.i("[SettingsAmazon]: ✓ Authentication successful!")
-
-            // Start AmazonService and trigger immediate library sync
-            Timber.i("[SettingsAmazon]: Starting AmazonService and triggering immediate library sync")
-            AmazonService.start(context)
-            AmazonService.triggerLibrarySync(context)
-
-            onSuccess()
-            onLoadingChange(false)
-            onDialogClose()
-        } else {
-            val error = result.exceptionOrNull()?.message ?: "Authentication failed"
-            Timber.e("[SettingsAmazon]: Authentication failed: $error")
-            onLoadingChange(false)
-            onError(error)
-        }
-    } catch (e: Exception) {
-        Timber.e(e, "[SettingsAmazon]: Authentication exception: ${e.message}")
-        onLoadingChange(false)
-        onError(e.message ?: "Authentication failed")
-    }
-}
+import app.gamenative.utils.PlatformOAuthHandlers
 
 @Composable
 fun SettingsGroupInterface(
@@ -336,7 +183,7 @@ fun SettingsGroupInterface(
             return@rememberLauncherForActivityResult
         }
         lifecycleScope.launch {
-            handleGogAuthentication(
+            PlatformOAuthHandlers.handleGogAuthentication(
                 context = context,
                 authCode = code,
                 coroutineScope = lifecycleScope,
@@ -377,7 +224,7 @@ fun SettingsGroupInterface(
             return@rememberLauncherForActivityResult
         }
         lifecycleScope.launch {
-            handleEpicAuthentication(
+            PlatformOAuthHandlers.handleEpicAuthentication(
                 context = context,
                 authCode = code,
                 coroutineScope = lifecycleScope,
@@ -417,7 +264,7 @@ fun SettingsGroupInterface(
             return@rememberLauncherForActivityResult
         }
         lifecycleScope.launch {
-            handleAmazonAuthentication(
+            PlatformOAuthHandlers.handleAmazonAuthentication(
                 context = context,
                 authCode = code,
                 coroutineScope = lifecycleScope,
@@ -446,7 +293,7 @@ fun SettingsGroupInterface(
             Timber.i("[SettingsGOG]: ✓ Received GOG auth code event")
 
             coroutineScope.launch {
-                handleGogAuthentication(
+                PlatformOAuthHandlers.handleGogAuthentication(
                     context = context,
                     authCode = event.authCode,
                     coroutineScope = coroutineScope,

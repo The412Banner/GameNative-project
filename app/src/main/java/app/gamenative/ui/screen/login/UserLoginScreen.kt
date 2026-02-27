@@ -1,6 +1,10 @@
 package app.gamenative.ui.screen.login
 
+import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -65,6 +69,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
@@ -78,8 +83,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import app.gamenative.Constants
+import app.gamenative.ui.screen.auth.AmazonOAuthActivity
+import app.gamenative.ui.screen.auth.EpicOAuthActivity
+import app.gamenative.ui.screen.auth.GOGOAuthActivity
+import app.gamenative.utils.PlatformOAuthHandlers
 import app.gamenative.R
 import app.gamenative.enums.LoginResult
 import app.gamenative.enums.LoginScreen
@@ -95,9 +107,132 @@ fun UserLoginScreen(
     viewModel: UserLoginViewModel = viewModel(),
     onRetryConnection: () -> Unit,
     onContinueOffline: () -> Unit,
+    onPlatformSignedIn: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val lifecycleScope = LocalLifecycleOwner.current.lifecycleScope
     val snackBarHostState = remember { SnackbarHostState() }
     val userLoginState by viewModel.loginState.collectAsState()
+
+    val gogOAuthLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        if (result.resultCode != android.app.Activity.RESULT_OK) {
+            val message = result.data?.getStringExtra(GOGOAuthActivity.EXTRA_ERROR)
+                ?: context.getString(R.string.gog_login_cancel)
+            android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show()
+            return@rememberLauncherForActivityResult
+        }
+        val code = result.data?.getStringExtra(GOGOAuthActivity.EXTRA_AUTH_CODE)
+        if (code == null) {
+            val message = result.data?.getStringExtra(GOGOAuthActivity.EXTRA_ERROR)
+                ?: context.getString(R.string.gog_login_cancel)
+            android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show()
+            return@rememberLauncherForActivityResult
+        }
+        lifecycleScope.launch {
+            PlatformOAuthHandlers.handleGogAuthentication(
+                context = context,
+                authCode = code,
+                coroutineScope = lifecycleScope,
+                onLoadingChange = { },
+                onError = { msg ->
+                    if (msg != null) {
+                        android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
+                    }
+                },
+                onSuccess = {
+                    android.widget.Toast.makeText(
+                        context,
+                        context.getString(R.string.gog_login_success_title),
+                        android.widget.Toast.LENGTH_SHORT,
+                    ).show()
+                    onPlatformSignedIn()
+                },
+                onDialogClose = { },
+            )
+        }
+    }
+
+    val epicOAuthLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        if (result.resultCode != android.app.Activity.RESULT_OK) {
+            val message = result.data?.getStringExtra(EpicOAuthActivity.EXTRA_ERROR)
+                ?: context.getString(R.string.epic_login_cancel)
+            android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show()
+            return@rememberLauncherForActivityResult
+        }
+        val code = result.data?.getStringExtra(EpicOAuthActivity.EXTRA_AUTH_CODE)
+        if (code == null) {
+            val message = result.data?.getStringExtra(EpicOAuthActivity.EXTRA_ERROR)
+                ?: context.getString(R.string.epic_login_cancel)
+            android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show()
+            return@rememberLauncherForActivityResult
+        }
+        lifecycleScope.launch {
+            PlatformOAuthHandlers.handleEpicAuthentication(
+                context = context,
+                authCode = code,
+                coroutineScope = lifecycleScope,
+                onLoadingChange = { },
+                onError = { msg ->
+                    if (msg != null) {
+                        android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
+                    }
+                },
+                onSuccess = {
+                    android.widget.Toast.makeText(
+                        context,
+                        context.getString(R.string.epic_login_success_title),
+                        android.widget.Toast.LENGTH_SHORT,
+                    ).show()
+                    onPlatformSignedIn()
+                },
+                onDialogClose = { },
+            )
+        }
+    }
+
+    val amazonOAuthLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        if (result.resultCode != android.app.Activity.RESULT_OK) {
+            val message = result.data?.getStringExtra(AmazonOAuthActivity.EXTRA_ERROR)
+                ?: context.getString(R.string.amazon_login_cancel)
+            android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show()
+            return@rememberLauncherForActivityResult
+        }
+        val code = result.data?.getStringExtra(AmazonOAuthActivity.EXTRA_AUTH_CODE)
+        if (code == null) {
+            val message = result.data?.getStringExtra(AmazonOAuthActivity.EXTRA_ERROR)
+                ?: context.getString(R.string.amazon_login_cancel)
+            android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show()
+            return@rememberLauncherForActivityResult
+        }
+        lifecycleScope.launch {
+            PlatformOAuthHandlers.handleAmazonAuthentication(
+                context = context,
+                authCode = code,
+                coroutineScope = lifecycleScope,
+                onLoadingChange = { },
+                onError = { msg ->
+                    if (msg != null) {
+                        android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
+                    }
+                },
+                onSuccess = {
+                    android.widget.Toast.makeText(
+                        context,
+                        context.getString(R.string.amazon_login_success_title),
+                        android.widget.Toast.LENGTH_SHORT,
+                    ).show()
+                    onPlatformSignedIn()
+                },
+                onDialogClose = { },
+            )
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.snackEvents.collect { message ->
@@ -119,6 +254,9 @@ fun UserLoginScreen(
         onSetTwoFactor = viewModel::setTwoFactorCode,
         onRetryConnection = onRetryConnection,
         onContinueOffline = onContinueOffline,
+        onLaunchGog = { gogOAuthLauncher.launch(Intent(context, GOGOAuthActivity::class.java)) },
+        onLaunchEpic = { epicOAuthLauncher.launch(Intent(context, EpicOAuthActivity::class.java)) },
+        onLaunchAmazon = { amazonOAuthLauncher.launch(Intent(context, AmazonOAuthActivity::class.java)) },
     )
 }
 
@@ -138,6 +276,9 @@ private fun UserLoginScreenContent(
     onSetTwoFactor: (String) -> Unit,
     onRetryConnection: () -> Unit,
     onContinueOffline: () -> Unit,
+    onLaunchGog: () -> Unit,
+    onLaunchEpic: () -> Unit,
+    onLaunchAmazon: () -> Unit,
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary
     val tertiaryColor = MaterialTheme.colorScheme.tertiary
@@ -383,28 +524,66 @@ private fun UserLoginScreenContent(
                 }
             }
             
-            // Skip Steam login option
+            // Or sign in with: Epic · GOG · Amazon · Skip login
             if (
                 userLoginState.isLoggingIn.not() &&
                 userLoginState.loginResult != LoginResult.Success
             ) {
-                Column(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                         .padding(bottom = 8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    TextButton(
-                        onClick = onContinueOffline,
-                        modifier = Modifier.padding(top = 0.dp)
-                    ) {
+                    Text(
+                        text = stringResource(R.string.login_or_sign_in_with),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    TextButton(onClick = onLaunchEpic) {
                         Text(
-                            text = stringResource(R.string.login_skip_steam),
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontWeight = FontWeight.Medium
-                            ),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            text = "Epic",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                    Text(
+                        text = " · ",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    TextButton(onClick = onLaunchGog) {
+                        Text(
+                            text = "GOG",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                    Text(
+                        text = " · ",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    TextButton(onClick = onLaunchAmazon) {
+                        Text(
+                            text = "Amazon",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                    Text(
+                        text = " · ",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    TextButton(onClick = onContinueOffline) {
+                        Text(
+                            text = stringResource(R.string.login_skip_login),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
                 }
@@ -815,6 +994,9 @@ private fun Preview_UserLoginScreen(
                 onShowLoginScreen = { },
                 onRetryConnection = { },
                 onContinueOffline = { },
+                onLaunchGog = { },
+                onLaunchEpic = { },
+                onLaunchAmazon = { },
             )
         }
     }

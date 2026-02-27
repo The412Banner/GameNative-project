@@ -101,7 +101,7 @@
     <!-- Library Tabs -->
     <string name="tab_all">All</string>
     <string name="tab_steam">Steam</string>
-    <string name="tab_gog">GoG</string>
+    <string name="tab_gog">GOG</string>
     <string name="tab_epic">Epic</string>
     <string name="tab_amazon">Amazon</string>
     <string name="tab_installed">Installed</string>
@@ -746,6 +746,8 @@
     <string name="login_retry_qr">Retry QR Code</string>
     <string name="login_qr_instructions">Open the Steam mobile app and scan this QR code to sign in instantly</string>
     <string name="login_skip_steam">Skip Steam login</string>
+    <string name="login_or_sign_in_with">Or sign in with:</string>
+    <string name="login_skip_login">Skip login</string>
 
     <!-- Generic/Reusable strings -->
     <string name="continue_action">Continue</string>

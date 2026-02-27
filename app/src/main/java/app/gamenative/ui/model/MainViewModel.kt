@@ -116,7 +116,11 @@ class MainViewModel @Inject constructor(
         _state.update {
             it.copy(
                 isSteamConnected = false,
-                connectionState = ConnectionState.DISCONNECTED,
+                connectionState = if (it.connectionState != ConnectionState.OFFLINE_MODE) {
+                    ConnectionState.DISCONNECTED
+                } else {
+                    it.connectionState // Keep offline mode if user chose it
+                },
                 connectionMessage = null,
             )
         }
