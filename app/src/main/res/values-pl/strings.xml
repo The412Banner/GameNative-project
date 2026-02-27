@@ -482,6 +482,12 @@
     <string name="log_out">Wyloguj</string>
     <string name="close">Zamknij</string>
 
+    <!-- System menu platform actions -->
+    <string name="steam_sign_in">Zaloguj się do Steam</string>
+    <string name="steam_go_online">Przejdź online (Steam)</string>
+    <string name="steam_go_offline">Przejdź offline (Steam)</string>
+    <string name="steam_sign_out">Wyloguj ze Steam</string>
+
     <!-- Container Configuration: General -->
     <string name="new_environment_variable">Nowa zmienna środowiskowa</string>
     <string name="name">Nazwa</string>
@@ -1002,7 +1008,7 @@
 
     <!-- GOG Integration -->
     <string name="gog_integration_title">Integracja GOG (Alpha)</string>
-    <string name="gog_settings_login_title">Zaloguj się</string>
+    <string name="gog_settings_login_title">Zaloguj się do GOG</string>
     <string name="gog_settings_login_subtitle">Zaloguj się do swojego konta GOG</string>
     <string name="gog_login_success_title">Logowanie udane</string>
     <string name="gog_login_cancel">Anuluj</string>
@@ -1017,7 +1023,7 @@
 
     <!-- Epic Games Integration -->
     <string name="epic_integration_title">Integracja Epic Games</string>
-    <string name="epic_settings_login_title">Zaloguj się</string>
+    <string name="epic_settings_login_title">Zaloguj się do Epic</string>
     <string name="epic_settings_login_subtitle">Zaloguj się do swojego konta Epic Games</string>
     <string name="epic_login_success_title">Logowanie udane</string>
     <string name="epic_login_cancel">Anuluj</string>
@@ -1032,11 +1038,11 @@
 
     <!-- Amazon Games Integration -->
     <string name="amazon_integration_title">Integracja Amazon Games (Alpha)</string>
-    <string name="amazon_settings_login_title">Zaloguj się</string>
+    <string name="amazon_settings_login_title">Zaloguj się do Amazon Games</string>
     <string name="amazon_settings_login_subtitle">Zaloguj się na swoje konto Amazon Games</string>
     <string name="amazon_login_success_title">Logowanie pomyślne</string>
     <string name="amazon_login_cancel">Anuluj</string>
-    <string name="amazon_settings_logout_title">Wyloguj</string>
+    <string name="amazon_settings_logout_title">Wyloguj z Amazon Games</string>
     <string name="amazon_settings_logout_subtitle">Wyloguj się ze swojego konta Amazon Games</string>
     <string name="amazon_logout_confirm_title">Wylogować się z Amazon Games?</string>
     <string name="amazon_logout_confirm_message">Spowoduje to usunięcie danych logowania Amazon Games i wyczyszczenie biblioteki Amazon z tego urządzenia. Możesz zalogować się ponownie w dowolnym momencie.</string>

@@ -309,6 +309,12 @@
     <string name="log_out">Sair</string>
     <string name="close">Fechar</string>
 
+    <!-- System menu platform actions -->
+    <string name="steam_sign_in">Entrar no Steam</string>
+    <string name="steam_go_online">Ficar online (Steam)</string>
+    <string name="steam_go_offline">Ficar offline (Steam)</string>
+    <string name="steam_sign_out">Sair do Steam</string>
+
     <!-- Container Configuration: General -->
     <string name="new_environment_variable">Nova Variável de Ambiente</string>
     <string name="name">Nome</string>
@@ -856,11 +862,11 @@
 
     <!-- GOG Integration -->
     <string name="gog_integration_title">Integração GOG (Alpha)</string>
-    <string name="gog_settings_login_title">Entrar</string>
+    <string name="gog_settings_login_title">Entrar no GOG</string>
     <string name="gog_settings_login_subtitle">Entre na sua conta GOG</string>
     <string name="gog_login_success_title">Login bem-sucedido</string>
     <string name="gog_login_cancel">Cancelar</string>
-    <string name="gog_settings_logout_title">Sair</string>
+    <string name="gog_settings_logout_title">Sair do GOG</string>
     <string name="gog_settings_logout_subtitle">Desconectar da sua conta GOG</string>
     <string name="gog_logout_confirm_title">Sair do GOG?</string>
     <string name="gog_logout_confirm_message">Isso removerá suas credenciais GOG e limpará sua biblioteca GOG deste dispositivo. Você pode entrar novamente a qualquer momento.</string>
@@ -871,11 +877,11 @@
 
     <!-- Epic Games Integration -->
     <string name="epic_integration_title">Integração Epic Games</string>
-    <string name="epic_settings_login_title">Entrar</string>
+    <string name="epic_settings_login_title">Entrar no Epic</string>
     <string name="epic_settings_login_subtitle">Entre na sua conta Epic Games</string>
     <string name="epic_login_success_title">Login bem-sucedido</string>
     <string name="epic_login_cancel">Cancelar</string>
-    <string name="epic_settings_logout_title">Sair</string>
+    <string name="epic_settings_logout_title">Sair do Epic</string>
     <string name="epic_settings_logout_subtitle">Desconecte sua conta Epic Games</string>
     <string name="epic_logout_confirm_title">Sair do Epic Games?</string>
     <string name="epic_logout_confirm_message">Isso removerá suas credenciais Epic Games e limpará sua biblioteca Epic Games deste dispositivo. Você pode entrar novamente a qualquer momento.</string>
@@ -886,11 +892,11 @@
 
     <!-- Amazon Games Integration -->
     <string name="amazon_integration_title">Integração Amazon Games (Alpha)</string>
-    <string name="amazon_settings_login_title">Entrar</string>
+    <string name="amazon_settings_login_title">Entrar no Amazon Games</string>
     <string name="amazon_settings_login_subtitle">Entre na sua conta Amazon Games</string>
     <string name="amazon_login_success_title">Login realizado com sucesso</string>
     <string name="amazon_login_cancel">Cancelar</string>
-    <string name="amazon_settings_logout_title">Sair</string>
+    <string name="amazon_settings_logout_title">Sair do Amazon Games</string>
     <string name="amazon_settings_logout_subtitle">Sair da sua conta Amazon Games</string>
     <string name="amazon_logout_confirm_title">Sair do Amazon Games?</string>
     <string name="amazon_logout_confirm_message">Isso removerá suas credenciais Amazon Games e limpará sua biblioteca Amazon deste dispositivo. Você pode entrar novamente a qualquer momento.</string>

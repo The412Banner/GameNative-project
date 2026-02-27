@@ -130,7 +130,6 @@ class MainViewModel @Inject constructor(
         Timber.i("Received logon started")
         _state.update {
             it.copy(
-                connectionState = ConnectionState.CONNECTING,
                 connectionMessage = null,
                 isSteamConnected = true,
             )
@@ -153,7 +152,6 @@ class MainViewModel @Inject constructor(
             LoginResult.Success -> {
                 _state.update {
                     it.copy(
-                        connectionState = ConnectionState.CONNECTED,
                         connectionMessage = null,
                         connectionTimeoutSeconds = 0,
                     )
@@ -163,7 +161,6 @@ class MainViewModel @Inject constructor(
             LoginResult.Failed -> {
                 _state.update {
                     it.copy(
-                        connectionState = ConnectionState.DISCONNECTED,
                         connectionMessage = event.message, // null falls back to UI string resource
                     )
                 }
@@ -220,7 +217,7 @@ class MainViewModel @Inject constructor(
         // On app startup, Steam service is starting to connect, so default to CONNECTING
         // Only use DISCONNECTED after an actual disconnect event occurs
         val initialConnectionState = when {
-            SteamService.isLoggedIn -> ConnectionState.CONNECTED
+            SteamService.isConnected -> ConnectionState.CONNECTED
             else -> ConnectionState.CONNECTING // Service is starting up or connecting
         }
 

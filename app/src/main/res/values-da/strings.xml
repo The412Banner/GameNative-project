@@ -309,6 +309,12 @@
     <string name="log_out">Log ud</string>
     <string name="close">Luk</string>
 
+    <!-- System menu platform actions -->
+    <string name="steam_sign_in">Log ind på Steam</string>
+    <string name="steam_go_online">Gå online (Steam)</string>
+    <string name="steam_go_offline">Gå offline (Steam)</string>
+    <string name="steam_sign_out">Log ud af Steam</string>
+
     <!-- Container Configuration: General -->
     <string name="new_environment_variable">Ny miljøvariabel</string>
     <string name="name">Navn</string>
@@ -856,11 +862,11 @@
 
     <!-- GOG Integration -->
     <string name="gog_integration_title">GOG Integration (Alpha)</string>
-    <string name="gog_settings_login_title">Log ind</string>
+    <string name="gog_settings_login_title">Log ind på GOG</string>
     <string name="gog_settings_login_subtitle">Log ind på din GOG-konto</string>
     <string name="gog_login_success_title">Login lykkedes</string>
     <string name="gog_login_cancel">Annuller</string>
-    <string name="gog_settings_logout_title">Log ud</string>
+    <string name="gog_settings_logout_title">Log ud af GOG</string>
     <string name="gog_settings_logout_subtitle">Log ud fra din GOG-konto</string>
     <string name="gog_logout_confirm_title">Log ud fra GOG?</string>
     <string name="gog_logout_confirm_message">Dette vil fjerne dine GOG-legitimationsoplysninger og rydde dit GOG-bibliotek fra denne enhed. Du kan logge ind igen når som helst.</string>
@@ -871,7 +877,7 @@
 
     <!-- Epic Games Integration -->
     <string name="epic_integration_title">Epic Games Integration</string>
-    <string name="epic_settings_login_title">Log ind</string>
+    <string name="epic_settings_login_title">Log ind på Epic</string>
     <string name="epic_settings_login_subtitle">Log ind på din Epic Games-konto</string>
     <string name="epic_login_success_title">Login lykkedes</string>
     <string name="epic_login_cancel">Annuller</string>
@@ -886,11 +892,11 @@
 
     <!-- Amazon Games Integration -->
     <string name="amazon_integration_title">Amazon Games Integration (Alpha)</string>
-    <string name="amazon_settings_login_title">Log ind</string>
+    <string name="amazon_settings_login_title">Log ind på Amazon Games</string>
     <string name="amazon_settings_login_subtitle">Log ind på din Amazon Games-konto</string>
     <string name="amazon_login_success_title">Login lykkedes</string>
     <string name="amazon_login_cancel">Annuller</string>
-    <string name="amazon_settings_logout_title">Log ud</string>
+    <string name="amazon_settings_logout_title">Log ud af Amazon Games</string>
     <string name="amazon_settings_logout_subtitle">Log ud fra din Amazon Games-konto</string>
     <string name="amazon_logout_confirm_title">Log ud fra Amazon Games?</string>
     <string name="amazon_logout_confirm_message">Dette vil fjerne dine Amazon Games-legitimationsoplysninger og rydde dit Amazon-bibliotek fra denne enhed. Du kan logge ind igen når som helst.</string>

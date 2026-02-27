@@ -71,8 +71,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 import app.gamenative.utils.LocaleHelper
-import app.gamenative.service.gog.GOGService
-import app.gamenative.service.epic.EpicService
 import app.gamenative.service.epic.EpicAuthManager
 import android.content.Context
 import android.content.Intent
@@ -86,8 +84,8 @@ import app.gamenative.ui.screen.auth.EpicOAuthActivity
 import app.gamenative.ui.screen.auth.GOGOAuthActivity
 import app.gamenative.ui.screen.auth.AmazonOAuthActivity
 import app.gamenative.service.amazon.AmazonAuthManager
-import app.gamenative.service.amazon.AmazonService
 import app.gamenative.utils.PlatformOAuthHandlers
+import app.gamenative.ui.util.PlatformAuthUiHelpers
 
 @Composable
 fun SettingsGroupInterface(
@@ -165,126 +163,9 @@ fun SettingsGroupInterface(
     // returning from GOGOAuthActivity (composition may have been left → rememberCoroutineScope cancelled).
     val lifecycleScope = LocalLifecycleOwner.current.lifecycleScope
 
-    // GOG in-app OAuth (WebView) launcher; result delivers auth code automatically
-    val gogOAuthLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode != android.app.Activity.RESULT_OK) {
-            val message = result.data?.getStringExtra(GOGOAuthActivity.EXTRA_ERROR)
-                ?: context.getString(R.string.gog_login_cancel)
-            android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show()
-            return@rememberLauncherForActivityResult
-        }
-        val code = result.data?.getStringExtra(GOGOAuthActivity.EXTRA_AUTH_CODE)
-        if (code == null) {
-            val message = result.data?.getStringExtra(GOGOAuthActivity.EXTRA_ERROR)
-                ?: context.getString(R.string.gog_login_cancel)
-            android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show()
-            return@rememberLauncherForActivityResult
-        }
-        lifecycleScope.launch {
-            PlatformOAuthHandlers.handleGogAuthentication(
-                context = context,
-                authCode = code,
-                coroutineScope = lifecycleScope,
-                onLoadingChange = { gogLoginLoading = it },
-                onError = { msg ->
-                    if (msg != null) {
-                        android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
-                    }
-                },
-                onSuccess = { count ->
-                    gogLibraryGameCount = count
-                    android.widget.Toast.makeText(
-                        context,
-                        context.getString(R.string.gog_login_success_title),
-                        android.widget.Toast.LENGTH_SHORT
-                    ).show()
-                },
-                onDialogClose = { }
-            )
-        }
-    }
-
-    // Epic in-app OAuth (WebView) launcher; result delivers auth code automatically (lifecycleScope like GOG)
-    val epicOAuthLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode != android.app.Activity.RESULT_OK) {
-            val message = result.data?.getStringExtra(EpicOAuthActivity.EXTRA_ERROR)
-                ?: context.getString(R.string.epic_login_cancel)
-            android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show()
-            return@rememberLauncherForActivityResult
-        }
-        val code = result.data?.getStringExtra(EpicOAuthActivity.EXTRA_AUTH_CODE)
-        if (code == null) {
-            val message = result.data?.getStringExtra(EpicOAuthActivity.EXTRA_ERROR)
-                ?: context.getString(R.string.epic_login_cancel)
-            android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show()
-            return@rememberLauncherForActivityResult
-        }
-        lifecycleScope.launch {
-            PlatformOAuthHandlers.handleEpicAuthentication(
-                context = context,
-                authCode = code,
-                coroutineScope = lifecycleScope,
-                onLoadingChange = { epicLoginLoading = it },
-                onError = { msg ->
-                    if (msg != null) {
-                        android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
-                    }
-                },
-                onSuccess = {
-                    android.widget.Toast.makeText(
-                        context,
-                        context.getString(R.string.epic_login_success_title),
-                        android.widget.Toast.LENGTH_SHORT
-                    ).show()
-                },
-                onDialogClose = { }
-            )
-        }
-    }
-
-    // Amazon in-app OAuth (WebView PKCE) launcher; result delivers auth code automatically
-    val amazonOAuthLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode != android.app.Activity.RESULT_OK) {
-            val message = result.data?.getStringExtra(AmazonOAuthActivity.EXTRA_ERROR)
-                ?: context.getString(R.string.amazon_login_cancel)
-            android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show()
-            return@rememberLauncherForActivityResult
-        }
-        val code = result.data?.getStringExtra(AmazonOAuthActivity.EXTRA_AUTH_CODE)
-        if (code == null) {
-            val message = result.data?.getStringExtra(AmazonOAuthActivity.EXTRA_ERROR)
-                ?: context.getString(R.string.amazon_login_cancel)
-            android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_LONG).show()
-            return@rememberLauncherForActivityResult
-        }
-        lifecycleScope.launch {
-            PlatformOAuthHandlers.handleAmazonAuthentication(
-                context = context,
-                authCode = code,
-                coroutineScope = lifecycleScope,
-                onLoadingChange = { amazonLoginLoading = it },
-                onError = { msg ->
-                    if (msg != null) {
-                        android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
-                    }
-                },
-                onSuccess = {
-                    android.widget.Toast.makeText(
-                        context,
-                        context.getString(R.string.amazon_login_success_title),
-                        android.widget.Toast.LENGTH_SHORT
-                    ).show()
-                },
-                onDialogClose = { }
-            )
-        }
-    }
+    // OAuth launchers are now provided by a parent composable so they can be
+    // reused from both Settings and the System Menu. Settings continues to
+    // derive its own loading state and toasts via callbacks in that parent.
 
     // Listen for GOG OAuth callback (e.g. from event)
     DisposableEffect(Unit) {
@@ -396,94 +277,9 @@ fun SettingsGroupInterface(
         }
     }
 
-    // GOG logout confirmation dialog state
-    var showGOGLogoutDialog by rememberSaveable { mutableStateOf(false) }
-    var gogLogoutLoading by rememberSaveable { mutableStateOf(false) }
-
-    // GOG Integration
-    SettingsGroup(title = { Text(text = stringResource(R.string.gog_integration_title)) }) {
-        if (!app.gamenative.service.gog.GOGAuthManager.hasStoredCredentials(context)) {
-            SettingsMenuLink(
-                icon = { androidx.compose.material3.Icon(Icons.Default.Login, contentDescription = null) },
-                colors = settingsTileColorsAlt(),
-                title = { Text(text = stringResource(R.string.gog_settings_login_title)) },
-                subtitle = { Text(text = stringResource(R.string.gog_settings_login_subtitle)) },
-                onClick = {
-                    gogOAuthLauncher.launch(Intent(context, GOGOAuthActivity::class.java))
-                }
-            )
-        }
-        // Logout button - only show if credentials exist
-        if (app.gamenative.service.gog.GOGAuthManager.hasStoredCredentials(context)) {
-            SettingsMenuLink(
-                icon = { androidx.compose.material3.Icon(Icons.Default.Logout, contentDescription = null) },
-                colors = settingsTileColorsAlt(),
-                title = { Text(text = stringResource(R.string.gog_settings_logout_title)) },
-                subtitle = { Text(text = stringResource(R.string.gog_settings_logout_subtitle)) },
-                onClick = {
-                    showGOGLogoutDialog = true
-                }
-            )
-        }
-    }
-
-    // Epic Games Integration
-    SettingsGroup(title = { Text(text = stringResource(R.string.epic_integration_title)) }) {
-        if(!EpicAuthManager.hasStoredCredentials(context)) {
-            SettingsMenuLink(
-                icon = { androidx.compose.material3.Icon(Icons.Default.Login, contentDescription = null) },
-                colors = settingsTileColorsAlt(),
-                title = { Text(text = stringResource(R.string.epic_settings_login_title)) },
-                subtitle = { Text(text = stringResource(R.string.epic_settings_login_subtitle)) },
-                onClick = {
-                    epicOAuthLauncher.launch(Intent(context, EpicOAuthActivity::class.java))
-                }
-            )
-        }
-            // Epic Logout Button
-        if (EpicAuthManager.hasStoredCredentials(context)) {
-            SettingsMenuLink(
-                icon = { androidx.compose.material3.Icon(Icons.Default.Logout, contentDescription = null) },
-                title = { Text(text = stringResource(R.string.epic_settings_logout_title)) },
-                subtitle = { Text(text = stringResource(R.string.epic_settings_logout_subtitle)) },
-                onClick = {
-                    showEpicLogoutDialog = true
-                },
-                colors = settingsTileColorsAlt()
-            )
-        }
-    }
-
-    // Amazon Games logout confirmation dialog state
-    var showAmazonLogoutDialog by rememberSaveable { mutableStateOf(false) }
-    var amazonLogoutLoading by rememberSaveable { mutableStateOf(false) }
-
-    // Amazon Games Integration
-    SettingsGroup(title = { Text(text = stringResource(R.string.amazon_integration_title)) }) {
-        if (!AmazonAuthManager.hasStoredCredentials(context)) {
-            SettingsMenuLink(
-                icon = { androidx.compose.material3.Icon(Icons.Default.Login, contentDescription = null) },
-                colors = settingsTileColorsAlt(),
-                title = { Text(text = stringResource(R.string.amazon_settings_login_title)) },
-                subtitle = { Text(text = stringResource(R.string.amazon_settings_login_subtitle)) },
-                onClick = {
-                    amazonOAuthLauncher.launch(Intent(context, AmazonOAuthActivity::class.java))
-                }
-            )
-        }
-        // Amazon Logout Button
-        if (AmazonAuthManager.hasStoredCredentials(context)) {
-            SettingsMenuLink(
-                icon = { androidx.compose.material3.Icon(Icons.Default.Logout, contentDescription = null) },
-                title = { Text(text = stringResource(R.string.amazon_settings_logout_title)) },
-                subtitle = { Text(text = stringResource(R.string.amazon_settings_logout_subtitle)) },
-                onClick = {
-                    showAmazonLogoutDialog = true
-                },
-                colors = settingsTileColorsAlt()
-            )
-        }
-    }
+    // Platform integrations now live in the System Menu. The detailed
+    // integration tiles and logout flows have been removed from Settings
+    // to avoid duplication.
 
     // Downloads settings
     SettingsGroup(
@@ -762,192 +558,8 @@ fun SettingsGroupInterface(
         message = stringResource(R.string.settings_language_changing),
     )
 
-    // GOG login loading (after returning from OAuth activity)
-    LoadingDialog(
-        visible = gogLoginLoading,
-        progress = -1f,
-        message = stringResource(R.string.main_loading)
-    )
-
-    // GOG logout confirmation dialog
-    MessageDialog(
-        visible = showGOGLogoutDialog,
-        title = stringResource(R.string.gog_logout_confirm_title),
-        message = stringResource(R.string.gog_logout_confirm_message),
-        confirmBtnText = stringResource(R.string.gog_logout_confirm),
-        dismissBtnText = stringResource(R.string.cancel),
-        onConfirmClick = {
-            showGOGLogoutDialog = false
-            gogLogoutLoading = true
-            coroutineScope.launch {
-                try {
-                    Timber.d("[SettingsGOG] Starting logout...")
-                    val result = GOGService.logout(context)
-
-                    if (result.isSuccess) {
-                        Timber.i("[SettingsGOG] Logout successful")
-                        withContext(Dispatchers.Main) {
-                            android.widget.Toast.makeText(
-                                context,
-                                context.getString(R.string.gog_logout_success),
-                                android.widget.Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    } else {
-                        val error = result.exceptionOrNull()
-                        Timber.e(error, "[SettingsGOG] Logout failed")
-                        withContext(Dispatchers.Main) {
-                            android.widget.Toast.makeText(
-                                context,
-                                context.getString(R.string.gog_logout_failed, error?.message ?: "Unknown error"),
-                                android.widget.Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    }
-                } catch (e: Exception) {
-                    Timber.e(e, "[SettingsGOG] Exception during logout")
-                    withContext(Dispatchers.Main) {
-                        android.widget.Toast.makeText(
-                            context,
-                            context.getString(R.string.gog_logout_failed, e.message ?: "Unknown error"),
-                            android.widget.Toast.LENGTH_LONG
-                        ).show()
-                    }
-                } finally {
-                    gogLogoutLoading = false
-                }
-            }
-        },
-        onDismissRequest = { showGOGLogoutDialog = false },
-        onDismissClick = { showGOGLogoutDialog = false }
-    )
-
-    // GOG logout loading dialog
-    LoadingDialog(
-        visible = gogLogoutLoading,
-        progress = -1f,
-        message = stringResource(R.string.gog_logout_in_progress)
-    )
-
-    // Epic login loading (after returning from OAuth activity)
-    LoadingDialog(
-        visible = epicLoginLoading,
-        progress = -1f,
-        message = stringResource(R.string.main_loading)
-    )
-
-    // Epic logout confirmation dialog
-    MessageDialog(
-        visible = showEpicLogoutDialog,
-        title = stringResource(R.string.epic_logout_confirm_title),
-        message = stringResource(R.string.epic_logout_confirm_message),
-        confirmBtnText = stringResource(R.string.epic_logout_confirm),
-        dismissBtnText = stringResource(R.string.cancel),
-        onConfirmClick = {
-            showEpicLogoutDialog = false
-            epicLogoutLoading = true
-            coroutineScope.launch {
-                try {
-                    Timber.d("[SettingsEpic]: Starting logout...")
-                    val result = EpicService.logout(context)
-                    withContext(Dispatchers.Main) {
-                        epicLogoutLoading = false
-                        if (result.isSuccess) {
-                            Timber.i("[SettingsEpic]: ✓ Logout successful!")
-                            android.widget.Toast.makeText(
-                                context,
-                                context.getString(R.string.epic_logout_success),
-                                android.widget.Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            Timber.e("[SettingsEpic]: ✗ Logout failed: ${result.exceptionOrNull()?.message}")
-                            android.widget.Toast.makeText(
-                                context,
-                                context.getString(R.string.epic_logout_failed, result.exceptionOrNull()?.message ?: "Unknown"),
-                                android.widget.Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                } catch (e: Exception) {
-                    Timber.e(e, "[SettingsEpic]: Logout exception: ${e.message}")
-                    withContext(Dispatchers.Main) {
-                        epicLogoutLoading = false
-                        android.widget.Toast.makeText(
-                            context,
-                            context.getString(R.string.epic_logout_failed, e.message ?: "Unknown"),
-                            android.widget.Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            }
-        },
-        onDismissRequest = { showEpicLogoutDialog = false },
-        onDismissClick = { showEpicLogoutDialog = false }
-    )
-
-    // Epic logout loading dialog
-    LoadingDialog(
-        visible = epicLogoutLoading,
-        progress = -1f,
-        message = stringResource(R.string.epic_logout_in_progress)
-    )
-
-    // Amazon logout confirmation dialog
-    MessageDialog(
-        visible = showAmazonLogoutDialog,
-        title = stringResource(R.string.amazon_logout_confirm_title),
-        message = stringResource(R.string.amazon_logout_confirm_message),
-        confirmBtnText = stringResource(R.string.amazon_logout_confirm),
-        dismissBtnText = stringResource(R.string.cancel),
-        onConfirmClick = {
-            showAmazonLogoutDialog = false
-            amazonLogoutLoading = true
-            coroutineScope.launch {
-                try {
-                    Timber.d("[SettingsAmazon]: Starting logout...")
-                    val result = AmazonService.logout(context)
-                    withContext(Dispatchers.Main) {
-                        amazonLogoutLoading = false
-                        if (result.isSuccess) {
-                            Timber.i("[SettingsAmazon]: ✓ Logout successful!")
-                            android.widget.Toast.makeText(
-                                context,
-                                context.getString(R.string.amazon_logout_success),
-                                android.widget.Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            val error = result.exceptionOrNull()?.message ?: "Unknown"
-                            Timber.e("[SettingsAmazon]: Logout failed: $error")
-                            android.widget.Toast.makeText(
-                                context,
-                                context.getString(R.string.amazon_logout_failed, error),
-                                android.widget.Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                } catch (e: Exception) {
-                    Timber.e(e, "[SettingsAmazon]: Logout exception: ${e.message}")
-                    withContext(Dispatchers.Main) {
-                        amazonLogoutLoading = false
-                        android.widget.Toast.makeText(
-                            context,
-                            context.getString(R.string.amazon_logout_failed, e.message ?: "Unknown"),
-                            android.widget.Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            }
-        },
-        onDismissRequest = { showAmazonLogoutDialog = false },
-        onDismissClick = { showAmazonLogoutDialog = false }
-    )
-
-    // Amazon logout loading dialog
-    LoadingDialog(
-        visible = amazonLogoutLoading,
-        progress = -1f,
-        message = stringResource(R.string.amazon_logout_in_progress)
-    )
+    // GOG/Epic/Amazon login and logout flows (including loading dialogs and
+    // confirmations) are now owned by the System Menu and shared helpers.
 
 }
 

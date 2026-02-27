@@ -446,6 +446,12 @@
     <string name="go_offline">Offline gehen</string>
     <string name="log_out">Abmelden</string>
     <string name="close">Schließen</string>
+
+    <!-- System menu platform actions -->
+    <string name="steam_sign_in">Bei Steam anmelden</string>
+    <string name="steam_go_online">Online gehen (Steam)</string>
+    <string name="steam_go_offline">Offline gehen (Steam)</string>
+    <string name="steam_sign_out">Von Steam abmelden</string>
     <!-- Container Configuration: General -->
     <string name="new_environment_variable">Neue Umgebungsvariable</string>
     <string name="name">Name</string>
@@ -922,11 +928,11 @@
 
     <!-- GOG Integration -->
     <string name="gog_integration_title">GOG-Integration (Alpha)</string>
-    <string name="gog_settings_login_title">Anmelden</string>
+    <string name="gog_settings_login_title">Bei GOG anmelden</string>
     <string name="gog_settings_login_subtitle">Bei deinem GOG-Konto anmelden</string>
     <string name="gog_login_success_title">Anmeldung erfolgreich</string>
     <string name="gog_login_cancel">Abbrechen</string>
-    <string name="gog_settings_logout_title">Abmelden</string>
+    <string name="gog_settings_logout_title">Von GOG abmelden</string>
     <string name="gog_settings_logout_subtitle">Von deinem GOG-Konto abmelden</string>
     <string name="gog_logout_confirm_title">Von GOG abmelden?</string>
     <string name="gog_logout_confirm_message">Dies entfernt deine GOG-Anmeldedaten und löscht deine GOG-Bibliothek von diesem Gerät. Du kannst dich jederzeit wieder anmelden.</string>
@@ -943,11 +949,11 @@
 
     <!-- Epic Games Integration -->
     <string name="epic_integration_title">Epic Games Integration</string>
-    <string name="epic_settings_login_title">Anmelden</string>
+    <string name="epic_settings_login_title">Bei Epic anmelden</string>
     <string name="epic_settings_login_subtitle">Bei deinem Epic Games-Konto anmelden</string>
     <string name="epic_login_success_title">Anmeldung erfolgreich</string>
     <string name="epic_login_cancel">Abbrechen</string>
-    <string name="epic_settings_logout_title">Abmelden</string>
+    <string name="epic_settings_logout_title">Von Epic abmelden</string>
     <string name="epic_settings_logout_subtitle">Von deinem Epic Games-Konto abmelden</string>
     <string name="epic_logout_confirm_title">Von Epic Games abmelden?</string>
     <string name="epic_logout_confirm_message">Dies entfernt deine Epic Games-Anmeldedaten und löscht deine Epic Games-Bibliothek von diesem Gerät. Du kannst dich jederzeit wieder anmelden.</string>
@@ -958,11 +964,11 @@
 
     <!-- Amazon Games Integration -->
     <string name="amazon_integration_title">Amazon Games Integration (Alpha)</string>
-    <string name="amazon_settings_login_title">Anmelden</string>
+    <string name="amazon_settings_login_title">Bei Amazon Games anmelden</string>
     <string name="amazon_settings_login_subtitle">Bei deinem Amazon Games-Konto anmelden</string>
     <string name="amazon_login_success_title">Anmeldung erfolgreich</string>
     <string name="amazon_login_cancel">Abbrechen</string>
-    <string name="amazon_settings_logout_title">Abmelden</string>
+    <string name="amazon_settings_logout_title">Von Amazon Games abmelden</string>
     <string name="amazon_settings_logout_subtitle">Von deinem Amazon Games-Konto abmelden</string>
     <string name="amazon_logout_confirm_title">Von Amazon Games abmelden?</string>
     <string name="amazon_logout_confirm_message">Dies entfernt deine Amazon Games-Anmeldedaten und löscht deine Amazon-Bibliothek von diesem Gerät. Du kannst dich jederzeit wieder anmelden.</string>

@@ -475,6 +475,12 @@
 	<string name="log_out">Deconectare</string>
 	<string name="close">Închide</string>
 
+    <!-- System menu platform actions -->
+    <string name="steam_sign_in">Autentificare la Steam</string>
+    <string name="steam_go_online">Intră online (Steam)</string>
+    <string name="steam_go_offline">Intră offline (Steam)</string>
+    <string name="steam_sign_out">Deconectare de la Steam</string>
+
     <!-- Container Configuration: General -->
 	<string name="new_environment_variable">Variabilă de mediu nouă</string>
 	<string name="name">Nume</string>
@@ -995,11 +1001,11 @@
 
 	<!-- GOG Integration -->
 	<string name="gog_integration_title">Integrare GOG (Alpha)</string>
-	<string name="gog_settings_login_title">Autentificare</string>
+	<string name="gog_settings_login_title">Autentificare la GOG</string>
 	<string name="gog_settings_login_subtitle">Autentifică-te în contul tău GOG</string>
 	<string name="gog_login_success_title">Autentificare reușită</string>
 	<string name="gog_login_cancel">Anulează</string>
-	<string name="gog_settings_logout_title">Deconectare</string>
+	<string name="gog_settings_logout_title">Deconectare de la GOG</string>
 	<string name="gog_settings_logout_subtitle">Deconectează-te din contul tău GOG</string>
 	<string name="gog_logout_confirm_title">Te deconectezi de la GOG?</string>
 	<string name="gog_logout_confirm_message">Aceasta va elimina datele tale GOG și va șterge biblioteca GOG de pe acest dispozitiv. Te poți autentifica din nou oricând.</string>
@@ -1010,11 +1016,11 @@
 
 	<!-- Epic Games Integration -->
 	<string name="epic_integration_title">Integrare Epic Games</string>
-	<string name="epic_settings_login_title">Autentificare</string>
+	<string name="epic_settings_login_title">Autentificare la Epic</string>
 	<string name="epic_settings_login_subtitle">Autentifică-te în contul tău Epic Games</string>
 	<string name="epic_login_success_title">Autentificare reușită</string>
 	<string name="epic_login_cancel">Anulează</string>
-	<string name="epic_settings_logout_title">Deconectare</string>
+	<string name="epic_settings_logout_title">Deconectare de la Epic</string>
 	<string name="epic_settings_logout_subtitle">Deconectează-te din contul tău Epic Games</string>
 	<string name="epic_logout_confirm_title">Te deconectezi de la Epic Games?</string>
 	<string name="epic_logout_confirm_message">Aceasta va elimina datele tale Epic Games și va șterge biblioteca Epic Games de pe acest dispozitiv. Te poți autentifica din nou oricând.</string>
@@ -1029,7 +1035,7 @@
 	<string name="amazon_settings_login_subtitle">Autentifică-te în contul tău Amazon Games</string>
 	<string name="amazon_login_success_title">Autentificare reușită</string>
 	<string name="amazon_login_cancel">Anulare</string>
-	<string name="amazon_settings_logout_title">Deconectare</string>
+	<string name="amazon_settings_logout_title">Deconectare de la Amazon Games</string>
 	<string name="amazon_settings_logout_subtitle">Deconectează-te din contul tău Amazon Games</string>
 	<string name="amazon_logout_confirm_title">Deconectare de la Amazon Games?</string>
 	<string name="amazon_logout_confirm_message">Acest lucru va șterge datele de autentificare Amazon Games și va curăța biblioteca Amazon de pe acest dispozitiv. Te poți autentifica din nou oricând.</string>

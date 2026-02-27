@@ -1036,7 +1036,8 @@ fun PluviaMain(
         }
 
         // Connection status banner (overlay) - dismissible so users can access navigation
-        if (state.currentScreen != PluviaScreen.LoginUser && !connectionBannerDismissed && state.connectionState != ConnectionState.OFFLINE_MODE) {
+        if (state.currentScreen != PluviaScreen.LoginUser && !connectionBannerDismissed && !SteamService.isConnected &&
+            PrefManager.refreshToken.isNotEmpty() && PrefManager.username.isNotEmpty()) {
             Box(modifier = Modifier.zIndex(5f)) {
                 ConnectionStatusBanner(
                     connectionState = state.connectionState,

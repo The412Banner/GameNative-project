@@ -468,6 +468,12 @@
     <string name="log_out">登出</string>
     <string name="close">關閉</string>
 
+    <!-- System menu platform actions -->
+    <string name="steam_sign_in">登入 Steam</string>
+    <string name="steam_go_online">上線 (Steam)</string>
+    <string name="steam_go_offline">離線 (Steam)</string>
+    <string name="steam_sign_out">登出 Steam</string>
+
     <!-- Container Configuration: General -->
     <string name="new_environment_variable">新增環境變數</string>
     <string name="name">名稱</string>
@@ -986,11 +992,11 @@
 
     <!-- GOG Integration -->
     <string name="gog_integration_title">GOG 整合 (Alpha)</string>
-    <string name="gog_settings_login_title">登入</string>
+    <string name="gog_settings_login_title">登入 GOG</string>
     <string name="gog_settings_login_subtitle">登入您的 GOG 帳戶</string>
     <string name="gog_login_success_title">登入成功</string>
     <string name="gog_login_cancel">取消</string>
-    <string name="gog_settings_logout_title">登出</string>
+    <string name="gog_settings_logout_title">登出 GOG</string>
     <string name="gog_settings_logout_subtitle">從您的 GOG 帳戶登出</string>
     <string name="gog_logout_confirm_title">從 GOG 登出?</string>
     <string name="gog_logout_confirm_message">這將刪除您的 GOG 憑證並清除此裝置上的 GOG 遊戲庫。您可以隨時重新登入。</string>
@@ -1001,11 +1007,11 @@
 
     <!-- Epic Games Integration -->
     <string name="epic_integration_title">Epic Games 整合</string>
-    <string name="epic_settings_login_title">登入</string>
+    <string name="epic_settings_login_title">登入 Epic</string>
     <string name="epic_settings_login_subtitle">登入您的 Epic Games 帳戶</string>
     <string name="epic_login_success_title">登入成功</string>
     <string name="epic_login_cancel">取消</string>
-    <string name="epic_settings_logout_title">登出</string>
+    <string name="epic_settings_logout_title">登出 Epic</string>
     <string name="epic_settings_logout_subtitle">從您的 Epic Games 帳戶登出</string>
     <string name="epic_logout_confirm_title">從 Epic Games 登出？</string>
     <string name="epic_logout_confirm_message">這將刪除您的 Epic Games 憑證並清除此裝置上的 Epic Games 遊戲庫。您可以隨時重新登入。</string>
@@ -1016,11 +1022,11 @@
 
     <!-- Amazon Games Integration -->
     <string name="amazon_integration_title">Amazon Games 整合 (Alpha)</string>
-    <string name="amazon_settings_login_title">登入</string>
+    <string name="amazon_settings_login_title">登入 Amazon Games</string>
     <string name="amazon_settings_login_subtitle">登入您的 Amazon Games 帳戶</string>
     <string name="amazon_login_success_title">登入成功</string>
     <string name="amazon_login_cancel">取消</string>
-    <string name="amazon_settings_logout_title">登出</string>
+    <string name="amazon_settings_logout_title">登出 Amazon Games</string>
     <string name="amazon_settings_logout_subtitle">從您的 Amazon Games 帳戶登出</string>
     <string name="amazon_logout_confirm_title">從 Amazon Games 登出？</string>
     <string name="amazon_logout_confirm_message">這將刪除您的 Amazon Games 憑證並清除此裝置上的 Amazon 庫。您可以隨時重新登入。</string>

@@ -246,6 +246,15 @@ fun SystemMenu(
     onLogout: () -> Unit,
     onGoOnline: () -> Unit,
     isOffline: Boolean = false,
+    gogLoggedIn: Boolean,
+    epicLoggedIn: Boolean,
+    amazonLoggedIn: Boolean,
+    onGogLoginClick: () -> Unit,
+    onGogLogoutClick: () -> Unit,
+    onEpicLoginClick: () -> Unit,
+    onEpicLogoutClick: () -> Unit,
+    onAmazonLoginClick: () -> Unit,
+    onAmazonLogoutClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scope = rememberCoroutineScope()
@@ -584,7 +593,11 @@ fun SystemMenu(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         if (isOffline) {
-                            val goOnlineLabelRes = if (!SteamService.isLoggedIn) R.string.login_sign_in else R.string.go_online
+                            val goOnlineLabelRes = if (!SteamService.isLoggedIn) {
+                                R.string.steam_sign_in
+                            } else {
+                                R.string.steam_go_online
+                            }
                             SystemMenuItem(
                                 text = stringResource(goOnlineLabelRes),
                                 icon = Icons.AutoMirrored.Filled.Login,
@@ -595,7 +608,7 @@ fun SystemMenu(
                             )
                         } else {
                             SystemMenuItem(
-                                text = stringResource(R.string.go_offline),
+                                text = stringResource(R.string.steam_go_offline),
                                 icon = Icons.AutoMirrored.Filled.AirplaneTicket,
                                 onClick = {
                                     onNavigateRoute(PluviaScreen.Home.route + "?offline=true") // TODO: test this
@@ -604,7 +617,7 @@ fun SystemMenu(
                             )
 
                             SystemMenuItem(
-                                text = stringResource(R.string.log_out),
+                                text = stringResource(R.string.steam_sign_out),
                                 icon = Icons.AutoMirrored.Filled.Logout,
                                 onClick = {
                                     onLogout()
@@ -613,6 +626,68 @@ fun SystemMenu(
                                 isDestructive = true,
                             )
                         }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // GOG
+                        SystemMenuItem(
+                            text = stringResource(
+                                if (gogLoggedIn) R.string.gog_settings_logout_title
+                                else R.string.gog_settings_login_title,
+                            ),
+                            icon = if (gogLoggedIn) {
+                                Icons.AutoMirrored.Filled.Logout
+                            } else {
+                                Icons.AutoMirrored.Filled.Login
+                            },
+                            onClick = {
+                                if (gogLoggedIn) onGogLogoutClick() else onGogLoginClick()
+                                onDismiss()
+                            },
+                            isDestructive = gogLoggedIn,
+                        )
+
+                        // Epic
+                        SystemMenuItem(
+                            text = stringResource(
+                                if (epicLoggedIn) R.string.epic_settings_logout_title
+                                else R.string.epic_settings_login_title,
+                            ),
+                            icon = if (epicLoggedIn) {
+                                Icons.AutoMirrored.Filled.Logout
+                            } else {
+                                Icons.AutoMirrored.Filled.Login
+                            },
+                            onClick = {
+                                if (epicLoggedIn) onEpicLogoutClick() else onEpicLoginClick()
+                                onDismiss()
+                            },
+                            isDestructive = epicLoggedIn,
+                        )
+
+                        // Amazon
+                        SystemMenuItem(
+                            text = stringResource(
+                                if (amazonLoggedIn) R.string.amazon_settings_logout_title
+                                else R.string.amazon_settings_login_title,
+                            ),
+                            icon = if (amazonLoggedIn) {
+                                Icons.AutoMirrored.Filled.Logout
+                            } else {
+                                Icons.AutoMirrored.Filled.Login
+                            },
+                            onClick = {
+                                if (amazonLoggedIn) onAmazonLogoutClick() else onAmazonLoginClick()
+                                onDismiss()
+                            },
+                            isDestructive = amazonLoggedIn,
+                        )
                     }
 
                     // Gamepad hint at bottom (only on expanded screens)
@@ -681,6 +756,15 @@ private fun Preview_SystemMenu() {
                     onLogout = { },
                     onGoOnline = { },
                     isOffline = false,
+                    gogLoggedIn = false,
+                    epicLoggedIn = false,
+                    amazonLoggedIn = false,
+                    onGogLoginClick = { },
+                    onGogLogoutClick = { },
+                    onEpicLoginClick = { },
+                    onEpicLogoutClick = { },
+                    onAmazonLoginClick = { },
+                    onAmazonLogoutClick = { },
                 )
             }
         }

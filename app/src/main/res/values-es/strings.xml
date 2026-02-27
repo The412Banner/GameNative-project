@@ -462,6 +462,12 @@
     <string name="log_out">Cerrar sesión</string>
     <string name="close">Cerrar</string>
 
+    <!-- System menu platform actions -->
+    <string name="steam_sign_in">Iniciar sesión en Steam</string>
+    <string name="steam_go_online">Conectarse (Steam)</string>
+    <string name="steam_go_offline">Desconectarse (Steam)</string>
+    <string name="steam_sign_out">Cerrar sesión de Steam</string>
+
     <!-- Container Configuration: General -->
     <string name="new_environment_variable">Nueva variable de entorno</string>
     <string name="name">Nombre</string>
@@ -962,11 +968,11 @@
 
     <!-- GOG Integration -->
     <string name="gog_integration_title">Integración de GOG (Alpha)</string>
-    <string name="gog_settings_login_title">Iniciar sesión</string>
+    <string name="gog_settings_login_title">Iniciar sesión en GOG</string>
     <string name="gog_settings_login_subtitle">Inicia sesión en tu cuenta de GOG.</string>
     <string name="gog_login_success_title">Inicio de sesión correcto</string>
     <string name="gog_login_cancel">Cancelar</string>
-    <string name="gog_settings_logout_title">Cerrar sesión</string>
+    <string name="gog_settings_logout_title">Cerrar sesión de GOG</string>
     <string name="gog_settings_logout_subtitle">Cierra la sesión de tu cuenta de GOG.</string>
     <string name="gog_logout_confirm_title">Cerrar sesión de GOG</string>
     <string name="gog_logout_confirm_message">Esto eliminará tus credenciales de GOG y borrará tu biblioteca de GOG de este dispositivo. Podrás volver a iniciar sesión en cualquier momento. ¿Deseas continuar?</string>
@@ -977,11 +983,11 @@
 
     <!-- Amazon Games Integration -->
     <string name="amazon_integration_title">Integración de Amazon Games (Alpha)</string>
-    <string name="amazon_settings_login_title">Iniciar sesión</string>
+    <string name="amazon_settings_login_title">Iniciar sesión en Amazon Games</string>
     <string name="amazon_settings_login_subtitle">Inicia sesión en tu cuenta de Amazon Games</string>
     <string name="amazon_login_success_title">Inicio de sesión exitoso</string>
     <string name="amazon_login_cancel">Cancelar</string>
-    <string name="amazon_settings_logout_title">Cerrar sesión</string>
+    <string name="amazon_settings_logout_title">Cerrar sesión de Amazon Games</string>
     <string name="amazon_settings_logout_subtitle">Cierra la sesión de tu cuenta de Amazon Games</string>
     <string name="amazon_logout_confirm_title">Cerrar sesión de Amazon Games</string>
     <string name="amazon_logout_confirm_message">Esto eliminará tus credenciales de Amazon Games y borrará tu biblioteca de Amazon de este dispositivo. Podrás volver a iniciar sesión en cualquier momento.</string>

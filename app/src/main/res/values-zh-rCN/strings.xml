@@ -465,6 +465,12 @@
     <string name="log_out">登出</string>
     <string name="close">关闭</string>
 
+    <!-- System menu platform actions -->
+    <string name="steam_sign_in">登录 Steam</string>
+    <string name="steam_go_online">上线 (Steam)</string>
+    <string name="steam_go_offline">离线 (Steam)</string>
+    <string name="steam_sign_out">退出 Steam</string>
+
     <!-- 容器配置：通用 -->
     <string name="new_environment_variable">新建环境变量</string>
     <string name="name">名称</string>
@@ -982,11 +988,11 @@
 
     <!-- GOG Integration -->
     <string name="gog_integration_title">GOG 集成 (Alpha)</string>
-    <string name="gog_settings_login_title">登录</string>
+    <string name="gog_settings_login_title">登录 GOG</string>
     <string name="gog_settings_login_subtitle">登录到您的 GOG 账户</string>
     <string name="gog_login_success_title">登录成功</string>
     <string name="gog_login_cancel">取消</string>
-    <string name="gog_settings_logout_title">注销</string>
+    <string name="gog_settings_logout_title">退出 GOG</string>
     <string name="gog_settings_logout_subtitle">从您的 GOG 账户登出</string>
     <string name="gog_logout_confirm_title">从 GOG 注销?</string>
     <string name="gog_logout_confirm_message">这将删除您的 GOG 凭据并清除此设备上的 GOG 库。您可以随时重新登录。</string>
@@ -1001,7 +1007,7 @@
     <string name="epic_settings_login_subtitle">登录到您的 Epic Games 账户</string>
     <string name="epic_login_success_title">登录成功</string>
     <string name="epic_login_cancel">取消</string>
-    <string name="epic_settings_logout_title">注销</string>
+    <string name="epic_settings_logout_title">退出 Epic</string>
     <string name="epic_settings_logout_subtitle">从您的 Epic Games 账户登出</string>
     <string name="epic_logout_confirm_title">从 Epic Games 注销？</string>
     <string name="epic_logout_confirm_message">这将删除您的 Epic Games 凭据并清除此设备上的 Epic Games 库。您可以随时重新登录。</string>
@@ -1012,11 +1018,11 @@
 
     <!-- Amazon Games Integration -->
     <string name="amazon_integration_title">Amazon Games 集成 (Alpha)</string>
-    <string name="amazon_settings_login_title">登录</string>
+    <string name="amazon_settings_login_title">登录 Amazon Games</string>
     <string name="amazon_settings_login_subtitle">登录您的 Amazon Games 账户</string>
     <string name="amazon_login_success_title">登录成功</string>
     <string name="amazon_login_cancel">取消</string>
-    <string name="amazon_settings_logout_title">注销</string>
+    <string name="amazon_settings_logout_title">退出 Amazon Games</string>
     <string name="amazon_settings_logout_subtitle">从您的 Amazon Games 账户注销</string>
     <string name="amazon_logout_confirm_title">从 Amazon Games 注销？</string>
     <string name="amazon_logout_confirm_message">这将删除您的 Amazon Games 凭据并清除此设备上的 Amazon 库。您可以随时重新登录。</string>

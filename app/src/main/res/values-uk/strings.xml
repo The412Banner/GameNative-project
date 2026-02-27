@@ -466,6 +466,12 @@
     <string name="log_out">Вийти з акаунта</string>
     <string name="close">Закрити</string>
 
+    <!-- System menu platform actions -->
+    <string name="steam_sign_in">Увійти в Steam</string>
+    <string name="steam_go_online">Перейти в мережу (Steam)</string>
+    <string name="steam_go_offline">Перейти в офлайн (Steam)</string>
+    <string name="steam_sign_out">Вийти з Steam</string>
+
     <!-- Container Configuration: General -->
     <string name="new_environment_variable">Нова змінна середовища</string>
     <string name="name">Назва</string>
@@ -986,11 +992,11 @@
 
     <!-- GOG Integration -->
     <string name="gog_integration_title">Інтеграція GOG (Альфа)</string>
-    <string name="gog_settings_login_title">Увійти</string>
+    <string name="gog_settings_login_title">Увійти в GOG</string>
     <string name="gog_settings_login_subtitle">Увійдіть у свій обліковий запис GOG</string>
     <string name="gog_login_success_title">Вхід успішний</string>
     <string name="gog_login_cancel">Скасувати</string>
-    <string name="gog_settings_logout_title">Вийти</string>
+    <string name="gog_settings_logout_title">Вийти з GOG</string>
     <string name="gog_settings_logout_subtitle">Вийти з облікового запису GOG</string>
     <string name="gog_logout_confirm_title">Вийти з GOG?</string>
     <string name="gog_logout_confirm_message">Це видалить ваші облікові дані GOG та очистить бібліотеку GOG на цьому пристрої. Ви можете увійти знову в будь-який час.</string>
@@ -1001,11 +1007,11 @@
 
     <!-- Epic Games Integration -->
     <string name="epic_integration_title">Інтеграція Epic Games</string>
-    <string name="epic_settings_login_title">Увійти</string>
+    <string name="epic_settings_login_title">Увійти в Epic</string>
     <string name="epic_settings_login_subtitle">Увійдіть у свій обліковий запис Epic Games</string>
     <string name="epic_login_success_title">Вхід успішний</string>
     <string name="epic_login_cancel">Скасувати</string>
-    <string name="epic_settings_logout_title">Вийти</string>
+    <string name="epic_settings_logout_title">Вийти з Epic</string>
     <string name="epic_settings_logout_subtitle">Відключіть свій обліковий запис Epic Games</string>
     <string name="epic_logout_confirm_title">Вийти з Epic Games?</string>
     <string name="epic_logout_confirm_message">Це видалить ваші облікові дані Epic Games та очистить бібліотеку Epic Games на цьому пристрої. Ви можете увійти знову в будь-який час.</string>
@@ -1016,11 +1022,11 @@
 
     <!-- Amazon Games Integration -->
     <string name="amazon_integration_title">Інтеграція Amazon Games (Alpha)</string>
-    <string name="amazon_settings_login_title">Увійти</string>
+    <string name="amazon_settings_login_title">Увійти в Amazon Games</string>
     <string name="amazon_settings_login_subtitle">Увійдіть у свій обліковий запис Amazon Games</string>
     <string name="amazon_login_success_title">Вхід успішний</string>
     <string name="amazon_login_cancel">Скасувати</string>
-    <string name="amazon_settings_logout_title">Вийти</string>
+    <string name="amazon_settings_logout_title">Вийти з Amazon Games</string>
     <string name="amazon_settings_logout_subtitle">Вийти з облікового запису Amazon Games</string>
     <string name="amazon_logout_confirm_title">Вийти з Amazon Games?</string>
     <string name="amazon_logout_confirm_message">Це видалить ваші облікові дані Amazon Games та очистить вашу бібліотеку Amazon на цьому пристрої. Ви можете увійти знову будь-коли.</string>

@@ -1,5 +1,6 @@
 package app.gamenative.ui.screen.library
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -55,7 +56,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import app.gamenative.PrefManager
 import app.gamenative.PluviaApp
 import app.gamenative.R
@@ -81,9 +84,16 @@ import app.gamenative.ui.screen.library.components.LibraryListPane
 import app.gamenative.ui.screen.library.components.LibraryOptionsPanel
 import app.gamenative.ui.screen.library.components.LibrarySearchBar
 import app.gamenative.ui.screen.library.components.LibraryTabBar
+import app.gamenative.ui.screen.auth.AmazonOAuthActivity
+import app.gamenative.ui.screen.auth.EpicOAuthActivity
+import app.gamenative.ui.screen.auth.GOGOAuthActivity
 import app.gamenative.ui.screen.library.components.SystemMenu
 import app.gamenative.ui.theme.PluviaTheme
+import app.gamenative.ui.util.PlatformAuthUiHelpers
+import app.gamenative.ui.util.PlatformLogoutCallbacks
 import app.gamenative.utils.CustomGameScanner
+import app.gamenative.utils.PlatformOAuthHandlers
+import kotlinx.coroutines.launch
 import android.os.SystemClock
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -153,6 +163,125 @@ private fun LibraryScreenContent(
     isOffline: Boolean = false,
 ) {
     val context = LocalContext.current
+    val lifecycleScope = LocalLifecycleOwner.current.lifecycleScope
+
+    val gogOAuthLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        if (result.resultCode != android.app.Activity.RESULT_OK) {
+            val message = result.data?.getStringExtra(GOGOAuthActivity.EXTRA_ERROR)
+                ?: context.getString(R.string.gog_login_cancel)
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            return@rememberLauncherForActivityResult
+        }
+        val code = result.data?.getStringExtra(GOGOAuthActivity.EXTRA_AUTH_CODE)
+        if (code == null) {
+            val message = result.data?.getStringExtra(GOGOAuthActivity.EXTRA_ERROR)
+                ?: context.getString(R.string.gog_login_cancel)
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            return@rememberLauncherForActivityResult
+        }
+        lifecycleScope.launch {
+            PlatformOAuthHandlers.handleGogAuthentication(
+                context = context,
+                authCode = code,
+                coroutineScope = lifecycleScope,
+                onLoadingChange = { },
+                onError = { msg ->
+                    if (msg != null) {
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                    }
+                },
+                onSuccess = {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.gog_login_success_title),
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                },
+                onDialogClose = { },
+            )
+        }
+    }
+
+    val epicOAuthLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        if (result.resultCode != android.app.Activity.RESULT_OK) {
+            val message = result.data?.getStringExtra(EpicOAuthActivity.EXTRA_ERROR)
+                ?: context.getString(R.string.epic_login_cancel)
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            return@rememberLauncherForActivityResult
+        }
+        val code = result.data?.getStringExtra(EpicOAuthActivity.EXTRA_AUTH_CODE)
+        if (code == null) {
+            val message = result.data?.getStringExtra(EpicOAuthActivity.EXTRA_ERROR)
+                ?: context.getString(R.string.epic_login_cancel)
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            return@rememberLauncherForActivityResult
+        }
+        lifecycleScope.launch {
+            PlatformOAuthHandlers.handleEpicAuthentication(
+                context = context,
+                authCode = code,
+                coroutineScope = lifecycleScope,
+                onLoadingChange = { },
+                onError = { msg ->
+                    if (msg != null) {
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                    }
+                },
+                onSuccess = {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.epic_login_success_title),
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                },
+                onDialogClose = { },
+            )
+        }
+    }
+
+    val amazonOAuthLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        if (result.resultCode != android.app.Activity.RESULT_OK) {
+            val message = result.data?.getStringExtra(AmazonOAuthActivity.EXTRA_ERROR)
+                ?: context.getString(R.string.amazon_login_cancel)
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            return@rememberLauncherForActivityResult
+        }
+        val code = result.data?.getStringExtra(AmazonOAuthActivity.EXTRA_AUTH_CODE)
+        if (code == null) {
+            val message = result.data?.getStringExtra(AmazonOAuthActivity.EXTRA_ERROR)
+                ?: context.getString(R.string.amazon_login_cancel)
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            return@rememberLauncherForActivityResult
+        }
+        lifecycleScope.launch {
+            PlatformOAuthHandlers.handleAmazonAuthentication(
+                context = context,
+                authCode = code,
+                coroutineScope = lifecycleScope,
+                onLoadingChange = { },
+                onError = { msg ->
+                    if (msg != null) {
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                    }
+                },
+                onSuccess = {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.amazon_login_success_title),
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                },
+                onDialogClose = { },
+            )
+        }
+    }
+
     var selectedAppId by remember { mutableStateOf<String?>(null) }
     val isViewWide = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     var currentPaneType by remember { mutableStateOf(PrefManager.libraryLayout) }
@@ -802,6 +931,11 @@ private fun LibraryScreenContent(
             )
 
             // System menu (START) - renders on top of everything
+            val context = LocalContext.current
+            val gogLoggedIn = app.gamenative.service.gog.GOGAuthManager.hasStoredCredentials(context)
+            val epicLoggedIn = app.gamenative.service.epic.EpicAuthManager.hasStoredCredentials(context)
+            val amazonLoggedIn = app.gamenative.service.amazon.AmazonAuthManager.hasStoredCredentials(context)
+
             SystemMenu(
                 isOpen = isSystemMenuOpen,
                 onDismiss = { isSystemMenuOpen = false },
@@ -809,6 +943,39 @@ private fun LibraryScreenContent(
                 onLogout = onLogout,
                 onGoOnline = onGoOnline,
                 isOffline = isOffline,
+                gogLoggedIn = gogLoggedIn,
+                epicLoggedIn = epicLoggedIn,
+                amazonLoggedIn = amazonLoggedIn,
+                onGogLoginClick = {
+                    gogOAuthLauncher.launch(Intent(context, GOGOAuthActivity::class.java))
+                },
+                onGogLogoutClick = {
+                    PlatformAuthUiHelpers.logoutGog(
+                        context = context,
+                        scope = lifecycleScope,
+                        callbacks = PlatformLogoutCallbacks(),
+                    )
+                },
+                onEpicLoginClick = {
+                    epicOAuthLauncher.launch(Intent(context, EpicOAuthActivity::class.java))
+                },
+                onEpicLogoutClick = {
+                    PlatformAuthUiHelpers.logoutEpic(
+                        context = context,
+                        scope = lifecycleScope,
+                        callbacks = PlatformLogoutCallbacks(),
+                    )
+                },
+                onAmazonLoginClick = {
+                    amazonOAuthLauncher.launch(Intent(context, AmazonOAuthActivity::class.java))
+                },
+                onAmazonLogoutClick = {
+                    PlatformAuthUiHelpers.logoutAmazon(
+                        context = context,
+                        scope = lifecycleScope,
+                        callbacks = PlatformLogoutCallbacks(),
+                    )
+                },
             )
         }
 
