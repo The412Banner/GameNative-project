@@ -330,9 +330,7 @@ private fun QuickMenuItemRow(
 
         Text(
             text = stringResource(item.labelResId),
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontWeight = if (isFocused && isEnabled) FontWeight.SemiBold else FontWeight.Normal
-            ),
+            style = MaterialTheme.typography.bodyLarge,
             color = when {
                 !isEnabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = disabledAlpha)
                 isFocused -> accentColor
