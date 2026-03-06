@@ -1,6 +1,6 @@
-package com.mihoyo.genshinimpact
+package com.tencent.ig
 
-import com.mihoyo.genshinimpact.enums.OS
+import com.tencent.ig.enums.OS
 import java.util.EnumSet
 import junit.framework.TestCase.assertEquals
 import org.junit.Test

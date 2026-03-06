@@ -8,7 +8,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.mihoyo.genshinimpact.R;
+import com.tencent.ig.R;
 import com.winlator.core.Callback;
 import com.winlator.core.FileUtils;
 

@@ -1,4 +1,4 @@
-package com.mihoyo.genshinimpact
+package com.tencent.ig
 
 import org.junit.Assert.*
 import org.junit.Test

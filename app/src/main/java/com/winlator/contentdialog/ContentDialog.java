@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import com.mihoyo.genshinimpact.R;
+import com.tencent.ig.R;
 import com.winlator.core.AppUtils;
 import com.winlator.core.Callback;
 

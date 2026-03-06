@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.winlator.xenvironment.ImageFs;
 
-import com.mihoyo.genshinimpact.R;
+import com.tencent.ig.R;
 import timber.log.Timber;
 
 import java.io.File;

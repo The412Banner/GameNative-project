@@ -38,7 +38,7 @@ public abstract class WineUtils {
                 missingDrives += "D:" + android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS);
             }
             if (!currentDrives.contains("E:")) {
-                missingDrives += "E:/data/data/com.mihoyo.genshinimpact/storage";
+                missingDrives += "E:/data/data/com.tencent.ig/storage";
             }
             String updatedDrives = missingDrives + currentDrives;
             container.setDrives(updatedDrives);
@@ -50,7 +50,7 @@ public abstract class WineUtils {
         for (String[] drive : container.drivesIterator()) {
             File linkTarget = new File(drive[1]);
             String path = linkTarget.getAbsolutePath();
-            if (!linkTarget.isDirectory() && path.endsWith("/com.mihoyo.genshinimpact/storage")) {
+            if (!linkTarget.isDirectory() && path.endsWith("/com.tencent.ig/storage")) {
                 linkTarget.mkdirs();
                 FileUtils.chmod(linkTarget, 0771);
             }
@@ -64,7 +64,7 @@ public abstract class WineUtils {
 
         // Create Steam symlink if we found the game directory
         if (gameDirectoryPath != null) {
-            // Extract game name from path like "/data/data/com.mihoyo.genshinimpact/Steam/steamapps/common/GameName"
+            // Extract game name from path like "/data/data/com.tencent.ig/Steam/steamapps/common/GameName"
             String gameName = new File(gameDirectoryPath).getName();
 
             // Create the Steam directory structure in C: drive

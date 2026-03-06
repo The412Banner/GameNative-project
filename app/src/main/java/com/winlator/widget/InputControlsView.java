@@ -25,7 +25,7 @@ import android.util.Log;
 
 import androidx.core.graphics.ColorUtils;
 
-import com.mihoyo.genshinimpact.R;
+import com.tencent.ig.R;
 import com.winlator.inputcontrols.Binding;
 import com.winlator.inputcontrols.ControlElement;
 import com.winlator.inputcontrols.ControlsProfile;
@@ -580,8 +580,8 @@ public class InputControlsView extends View {
         paint.setTextAlign(Paint.Align.CENTER);
         float textY = rect.centerY() - (paint.descent() + paint.ascent()) * 0.5f;
         String label = getContext().getString(containerShooterModeRuntime
-                ? com.mihoyo.genshinimpact.R.string.shooter_mode_on
-                : com.mihoyo.genshinimpact.R.string.shooter_mode_off);
+                ? com.tencent.ig.R.string.shooter_mode_on
+                : com.tencent.ig.R.string.shooter_mode_off);
         canvas.drawText(label, rect.centerX(), textY, paint);
     }
 

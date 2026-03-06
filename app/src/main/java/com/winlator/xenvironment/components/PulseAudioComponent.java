@@ -16,7 +16,7 @@ import com.winlator.xenvironment.XEnvironment;
 
 import java.io.File;
 
-import com.mihoyo.genshinimpact.BuildConfig;
+import com.tencent.ig.BuildConfig;
 
 public class PulseAudioComponent extends EnvironmentComponent {
     private final UnixSocketConfig socketConfig;
