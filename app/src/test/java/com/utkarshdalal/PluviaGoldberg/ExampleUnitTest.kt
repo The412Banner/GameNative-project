@@ -1,4 +1,4 @@
-package app.gamenative
+package com.mihoyo.genshinimpact
 
 import org.junit.Assert.*
 import org.junit.Test

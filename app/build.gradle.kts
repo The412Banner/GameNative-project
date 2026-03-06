@@ -29,7 +29,7 @@ room {
 }
 
 android {
-    namespace = "app.gamenative"
+    namespace = "com.mihoyo.genshinimpact"
     compileSdk = 35
 
     // https://developer.android.com/ndk/downloads
@@ -47,7 +47,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "app.gamenative"
+        applicationId = "com.mihoyo.genshinimpact"
 
         minSdk = 26
         targetSdk = 28

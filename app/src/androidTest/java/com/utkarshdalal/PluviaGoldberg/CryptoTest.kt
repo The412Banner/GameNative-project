@@ -1,7 +1,7 @@
-package app.gamenative
+package com.mihoyo.genshinimpact
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import app.gamenative.Crypto
+import com.mihoyo.genshinimpact.Crypto
 import java.security.SecureRandom
 import org.junit.Assert.*
 import org.junit.Test

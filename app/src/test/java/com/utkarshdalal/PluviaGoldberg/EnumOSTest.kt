@@ -1,6 +1,6 @@
-package app.gamenative
+package com.mihoyo.genshinimpact
 
-import app.gamenative.enums.OS
+import com.mihoyo.genshinimpact.enums.OS
 import java.util.EnumSet
 import junit.framework.TestCase.assertEquals
 import org.junit.Test

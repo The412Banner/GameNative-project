@@ -1,7 +1,7 @@
-package app.gamenative
+package com.mihoyo.genshinimpact
 
 import android.content.pm.ActivityInfo
-import app.gamenative.ui.enums.Orientation
+import com.mihoyo.genshinimpact.ui.enums.Orientation
 import java.util.EnumSet
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue

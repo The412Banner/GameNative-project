@@ -1,6 +1,6 @@
 package com.winlator.fexcore;
 
-import app.gamenative.R;
+import com.mihoyo.genshinimpact.R;
 
 import android.content.Context;
 import com.winlator.container.Shortcut;

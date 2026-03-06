@@ -6,11 +6,11 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
 
-import app.gamenative.R;
-import app.gamenative.enums.Marker;
-import app.gamenative.service.SteamService;
-import app.gamenative.utils.ContainerUtils;
-import app.gamenative.utils.MarkerUtils;
+import com.mihoyo.genshinimpact.R;
+import com.mihoyo.genshinimpact.enums.Marker;
+import com.mihoyo.genshinimpact.service.SteamService;
+import com.mihoyo.genshinimpact.utils.ContainerUtils;
+import com.mihoyo.genshinimpact.utils.MarkerUtils;
 
 // import com.winlator.MainActivity;
 // import com.winlator.R;

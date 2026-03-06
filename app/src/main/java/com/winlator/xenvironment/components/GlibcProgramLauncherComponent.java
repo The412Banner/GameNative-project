@@ -32,9 +32,9 @@ import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
 
-import app.gamenative.PluviaApp;
-import app.gamenative.events.AndroidEvent;
-import app.gamenative.service.SteamService;
+import com.mihoyo.genshinimpact.PluviaApp;
+import com.mihoyo.genshinimpact.events.AndroidEvent;
+import com.mihoyo.genshinimpact.service.SteamService;
 
 public class GlibcProgramLauncherComponent extends GuestProgramLauncherComponent {
     private String guestExecutable;

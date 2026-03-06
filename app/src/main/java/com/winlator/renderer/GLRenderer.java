@@ -8,7 +8,7 @@ import android.opengl.GLSurfaceView;
 
 // import com.winlator.R;
 // import com.winlator.XrActivity;
-import app.gamenative.R;
+import com.mihoyo.genshinimpact.R;
 import com.winlator.math.Mathf;
 import com.winlator.math.XForm;
 import com.winlator.renderer.material.CursorMaterial;
