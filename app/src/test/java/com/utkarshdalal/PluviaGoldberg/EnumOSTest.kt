@@ -1,6 +1,6 @@
-package com.mihoyo.genshinimpact
+package com.antutu.ABenchMark
 
-import com.mihoyo.genshinimpact.enums.OS
+import com.antutu.ABenchMark.enums.OS
 import java.util.EnumSet
 import junit.framework.TestCase.assertEquals
 import org.junit.Test

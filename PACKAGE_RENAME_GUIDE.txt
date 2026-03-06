@@ -1,0 +1,242 @@
+GAMENATIVE — PACKAGE RENAME ROADMAP
+=====================================
+How to rename the app package from "app.gamenative" to a custom package name.
+This is the manual version of what was done to produce com.antutu.ABenchMark.
+
+Throughout this guide, replace every instance of:
+  OLD_PACKAGE  =  app.gamenative
+  NEW_PACKAGE  =  your.custom.package   (e.g. com.example.myapp)
+
+---
+
+STEP 1 — FORK AND CLONE THE REPO
+----------------------------------
+1. Fork https://github.com/The412Banner/GameNative-project on GitHub.
+2. Clone your fork locally:
+     git clone https://github.com/YOUR_USERNAME/GameNative-project.git
+     cd GameNative-project
+
+
+STEP 2 — RENAME SOURCE DIRECTORIES
+------------------------------------
+The Java/Kotlin source files live under directories named after the package.
+You must rename those directories to match your new package name.
+
+There are 4 source sets to rename:
+
+  app/src/main/java/app/gamenative/
+  app/src/androidTest/java/app/gamenative/
+  app/src/sharedTest/java/app/gamenative/
+  app/src/test/java/app/gamenative/
+
+For each one, create the new directory path and move the contents:
+
+  mkdir -p app/src/main/java/your/custom/package
+  cp -r app/src/main/java/app/gamenative/* app/src/main/java/your/custom/package/
+  rm -rf app/src/main/java/app/gamenative
+
+  mkdir -p app/src/androidTest/java/your/custom/package
+  cp -r app/src/androidTest/java/app/gamenative/* app/src/androidTest/java/your/custom/package/
+  rm -rf app/src/androidTest/java/app/gamenative
+
+  mkdir -p app/src/sharedTest/java/your/custom/package
+  cp -r app/src/sharedTest/java/app/gamenative/* app/src/sharedTest/java/your/custom/package/
+  rm -rf app/src/sharedTest/java/app/gamenative
+
+  mkdir -p app/src/test/java/your/custom/package
+  cp -r app/src/test/java/app/gamenative/* app/src/test/java/your/custom/package/
+  rm -rf app/src/test/java/app/gamenative
+
+NOTE: If your package has dots in it (e.g. com.example.myapp), each segment
+is a directory level. "com.example.myapp" becomes com/example/myapp/.
+
+
+STEP 3 — FIND AND REPLACE ALL TEXT OCCURRENCES
+------------------------------------------------
+Every source file, config, and resource that references "app.gamenative"
+must be updated to your new package name.
+
+The file types that contain references are:
+  .kt  .java  .xml  .kts  .gradle  .json  .properties  .txt  .md
+
+Run a global find-and-replace across the entire repo. With sed on Linux/Mac:
+
+  find . -type f \( -name "*.kt" -o -name "*.java" -o -name "*.xml" \
+    -o -name "*.kts" -o -name "*.gradle" -o -name "*.json" \
+    -o -name "*.properties" -o -name "*.txt" -o -name "*.md" \) \
+    ! -path "./.git/*" ! -path "*/build/*" \
+    -exec sed -i 's/app\.gamenative/your.custom.package/g' {} +
+
+With Android Studio or IntelliJ: Edit > Find > Replace in Files
+  Search:  app.gamenative
+  Replace: your.custom.package
+  Scope:   Whole Project
+  File mask: leave blank (all files)
+
+HOW MANY FILES TO EXPECT: approximately 375 files will be changed.
+If your count is significantly lower, something was missed.
+
+
+STEP 4 — UPDATE app/build.gradle.kts
+--------------------------------------
+Open app/build.gradle.kts and find these two lines (around line 32 and 50):
+
+  namespace = "app.gamenative"
+  applicationId = "app.gamenative"
+
+Change both to your new package:
+
+  namespace = "your.custom.package"
+  applicationId = "your.custom.package"
+
+NOTE: The find-and-replace in Step 3 should have already handled this.
+Double-check it was applied correctly — these two fields are critical.
+If namespace and applicationId don't match your new package the build will fail.
+
+
+STEP 5 — COPY THE ROOM DATABASE SCHEMA FILES
+----------------------------------------------
+The app uses Room (Android's SQLite ORM) with migration history.
+Room looks for schema JSON files under a directory named after the
+fully-qualified database class name.
+
+There is an existing schema directory:
+  app/schemas/app.gamenative.db.PluviaDatabase/
+
+You must create a copy of it named after your new package:
+  app/schemas/your.custom.package.db.PluviaDatabase/
+
+Commands:
+  mkdir -p "app/schemas/your.custom.package.db.PluviaDatabase"
+  cp app/schemas/app.gamenative.db.PluviaDatabase/*.json \
+     "app/schemas/your.custom.package.db.PluviaDatabase/"
+
+The files to copy are: 8.json, 9.json, 10.json, 11.json, 12.json, 13.json
+
+Do NOT delete the old directory — leave both in place. Gradle may reference
+the old path depending on your build config, and keeping both avoids errors.
+
+WHY THIS STEP: If you skip it, KSP (the Kotlin annotation processor) will
+fail at compile time with an error about missing Room schema export directory.
+
+
+STEP 6 — FIX THE CI WORKFLOW (if building via GitHub Actions)
+--------------------------------------------------------------
+The app targets Android SDK 28. Google's lint tool treats this as an error
+("ExpiredTargetSdkVersion") and will block release builds.
+
+Open .github/workflows/tagged-release.yml and find the Gradle build step.
+It will look something like:
+
+  run: ./gradlew :app:assembleRelease
+
+Change it to skip the lint check:
+
+  run: ./gradlew :app:assembleRelease -x lintVitalRelease
+
+The flag "-x lintVitalRelease" tells Gradle to skip that specific task.
+Without this, the CI build will fail even if the code compiles cleanly.
+
+NOTE: This only affects CI. Local builds with Android Studio are not affected.
+
+
+STEP 7 — COMMIT YOUR CHANGES
+------------------------------
+Stage and commit everything:
+
+  git add -A
+  git commit -m "refactor: rename package from app.gamenative to your.custom.package"
+
+Push to your fork:
+
+  git push origin main
+
+
+STEP 8 — TRIGGER A BUILD AND GET YOUR APK
+-------------------------------------------
+The CI workflow triggers on tags that start with "v".
+Create and push a tag to start a build:
+
+  git tag v1.0.0
+  git push origin v1.0.0
+
+Wait for the GitHub Actions run to complete (usually 7-10 minutes).
+Go to: https://github.com/YOUR_USERNAME/GameNative-project/actions
+
+When it succeeds, download the APK from the release assets at:
+  https://github.com/YOUR_USERNAME/GameNative-project/releases
+
+
+STEP 9 — SIGN THE APK
+-----------------------
+The CI build produces an UNSIGNED APK. You must sign it before installing.
+
+If you don't have a keystore yet, create one:
+  keytool -genkey -v -keystore my-release-key.jks \
+    -alias my-key-alias -keyalg RSA -keysize 2048 -validity 10000
+
+Sign the APK:
+  apksigner sign \
+    --ks my-release-key.jks \
+    --ks-alias my-key-alias \
+    --out app-signed.apk \
+    app-release-unsigned.apk
+
+Verify the signature:
+  apksigner verify app-signed.apk
+
+Install:
+  adb install app-signed.apk
+  -- or --
+  Transfer app-signed.apk to your device and open it to sideload.
+
+IMPORTANT: If you are replacing an existing install, you must sign with the
+same keystore every time. Different keystores = Android will refuse to update
+and you will need to uninstall first (losing app data).
+
+
+---
+
+COMMON ERRORS AND FIXES
+=========================
+
+ERROR: "Package app.gamenative does not exist" at compile time
+  CAUSE: Some files were missed in Step 3.
+  FIX:   Re-run the find-and-replace, then grep for any remaining "app.gamenative"
+         references: grep -r "app.gamenative" . --include="*.kt" --include="*.java"
+
+ERROR: "Room schema export directory does not exist"
+  CAUSE: Step 5 was skipped or the directory name is wrong.
+  FIX:   Make sure the directory is named exactly:
+         app/schemas/your.custom.package.db.PluviaDatabase/
+         (dots in the package become dots in the directory name, not slashes)
+
+ERROR: "ExpiredTargetSdkVersion" lint failure in CI
+  CAUSE: Step 6 was not applied.
+  FIX:   Add -x lintVitalRelease to the Gradle command in the workflow file.
+
+ERROR: Build fails with "namespace not specified"
+  CAUSE: The namespace field in app/build.gradle.kts is missing or still old.
+  FIX:   Manually verify app/build.gradle.kts has:
+         namespace = "your.custom.package"
+
+ERROR: App installs but crashes immediately
+  CAUSE: A reference to the old package was missed in a resource XML or
+         AndroidManifest.xml (e.g. an intent action or authority string).
+  FIX:   Search for "app.gamenative" in all XML files and fix remaining ones.
+
+---
+
+SUMMARY CHECKLIST
+==================
+[ ] Fork and clone the repo
+[ ] Rename all 4 source directories (main, androidTest, sharedTest, test)
+[ ] Find-and-replace "app.gamenative" -> your package in ~375 files
+[ ] Verify namespace and applicationId in app/build.gradle.kts
+[ ] Copy Room schema files to new directory name
+[ ] Add -x lintVitalRelease to CI workflow Gradle command
+[ ] Commit and push
+[ ] Push a version tag (e.g. v1.0.0) to trigger CI build
+[ ] Download unsigned APK from release assets
+[ ] Sign APK with apksigner
+[ ] Install on device

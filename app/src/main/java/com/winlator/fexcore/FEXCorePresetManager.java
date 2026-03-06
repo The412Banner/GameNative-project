@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Locale;
 
-import com.mihoyo.genshinimpact.R;
+import com.antutu.ABenchMark.R;
 import timber.log.Timber;
 
 public abstract class FEXCorePresetManager {

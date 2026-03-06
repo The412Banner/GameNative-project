@@ -1,4 +1,4 @@
-package com.mihoyo.genshinimpact
+package com.antutu.ABenchMark
 
 import org.junit.Assert.*
 import org.junit.Test

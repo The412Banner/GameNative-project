@@ -49,9 +49,9 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mihoyo.genshinimpact.PluviaApp;
-import com.mihoyo.genshinimpact.events.AndroidEvent;
-import com.mihoyo.genshinimpact.service.SteamService;
+import com.antutu.ABenchMark.PluviaApp;
+import com.antutu.ABenchMark.events.AndroidEvent;
+import com.antutu.ABenchMark.service.SteamService;
 
 public class BionicProgramLauncherComponent extends GuestProgramLauncherComponent {
     private String guestExecutable;
@@ -186,10 +186,10 @@ public class BionicProgramLauncherComponent extends GuestProgramLauncherComponen
             String memPath;
             if (i == 0) {
                 // Player 1 uses the original, non-numbered path that is known to work.
-                memPath = "/data/data/com.mihoyo.genshinimpact/files/imagefs/tmp/gamepad.mem";
+                memPath = "/data/data/com.antutu.ABenchMark/files/imagefs/tmp/gamepad.mem";
             } else {
                 // Players 2, 3, 4 use a 1-based index.
-                memPath = "/data/data/com.mihoyo.genshinimpact/files/imagefs/tmp/gamepad" + i + ".mem";
+                memPath = "/data/data/com.antutu.ABenchMark/files/imagefs/tmp/gamepad" + i + ".mem";
             }
 
             File memFile = new File(memPath);

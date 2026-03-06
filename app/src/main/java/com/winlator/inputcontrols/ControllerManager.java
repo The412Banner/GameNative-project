@@ -8,7 +8,7 @@ import android.preference.PreferenceManager;
 import android.util.SparseArray;
 import android.view.InputDevice;
 
-import com.mihoyo.genshinimpact.PrefManager;
+import com.antutu.ABenchMark.PrefManager;
 
 import java.util.ArrayList;
 import java.util.List;

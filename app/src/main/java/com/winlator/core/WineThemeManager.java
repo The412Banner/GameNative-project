@@ -11,7 +11,7 @@ import android.graphics.RectF;
 import android.util.DisplayMetrics;
 
 // import com.winlator.R;
-import com.mihoyo.genshinimpact.R;
+import com.antutu.ABenchMark.R;
 import com.winlator.xenvironment.ImageFs;
 import com.winlator.xserver.ScreenInfo;
 

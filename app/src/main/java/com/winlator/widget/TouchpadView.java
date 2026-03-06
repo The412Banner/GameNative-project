@@ -14,8 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.mihoyo.genshinimpact.R;
-import com.mihoyo.genshinimpact.data.TouchGestureConfig;
+import com.antutu.ABenchMark.R;
+import com.antutu.ABenchMark.data.TouchGestureConfig;
 import com.winlator.core.AppUtils;
 import com.winlator.math.Mathf;
 import com.winlator.math.XForm;

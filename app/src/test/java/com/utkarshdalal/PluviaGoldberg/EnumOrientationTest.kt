@@ -1,7 +1,7 @@
-package com.mihoyo.genshinimpact
+package com.antutu.ABenchMark
 
 import android.content.pm.ActivityInfo
-import com.mihoyo.genshinimpact.ui.enums.Orientation
+import com.antutu.ABenchMark.ui.enums.Orientation
 import java.util.EnumSet
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue

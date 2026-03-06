@@ -1,7 +1,7 @@
-package com.mihoyo.genshinimpact
+package com.antutu.ABenchMark
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.mihoyo.genshinimpact.Crypto
+import com.antutu.ABenchMark.Crypto
 import java.security.SecureRandom
 import org.junit.Assert.*
 import org.junit.Test

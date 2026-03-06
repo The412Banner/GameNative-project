@@ -1,6 +1,6 @@
 package com.winlator.fexcore;
 
-import com.mihoyo.genshinimpact.R;
+import com.antutu.ABenchMark.R;
 
 import android.content.Context;
 import com.winlator.container.Shortcut;

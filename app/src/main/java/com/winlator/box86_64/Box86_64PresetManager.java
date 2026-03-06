@@ -5,7 +5,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
-import com.mihoyo.genshinimpact.R;
+import com.antutu.ABenchMark.R;
 import com.winlator.PrefManager;
 import com.winlator.core.envvars.EnvVars;
 
