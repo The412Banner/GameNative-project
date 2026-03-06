@@ -3,7 +3,7 @@ package com.winlator.contentdialog;
 import android.content.Context;
 import android.view.View;
 import android.widget.Spinner;
-import com.mihoyo.genshinimpact.R;
+import com.ludashi.benchmark.R;
 import com.winlator.core.AppUtils;
 import com.winlator.core.GPUHelper;
 import com.winlator.core.KeyValueSet;

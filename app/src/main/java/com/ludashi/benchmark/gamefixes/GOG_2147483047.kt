@@ -1,0 +1,13 @@
+package com.ludashi.benchmark.gamefixes
+
+import com.ludashi.benchmark.data.GameSource
+
+/**
+ * Moonlighter (GOG): manifest does not list MSVC2017_x64; ensure it is downloaded and available
+ * in _CommonRedist so the fix can run VC_redist.x64.exe.
+ */
+val GOG_Fix_2147483047: KeyedGameFix = GOGDependencyFix(
+    gameSource = GameSource.GOG,
+    gameId = "2147483047",
+    dependencyIds = listOf("MSVC2017", "MSVC2017_x64"),
+)

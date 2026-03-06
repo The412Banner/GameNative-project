@@ -19,7 +19,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.material.navigation.NavigationView;
-import com.mihoyo.genshinimpact.R;
+import com.ludashi.benchmark.R;
 import com.winlator.inputcontrols.ControllerManager;
 
 public class NavigationDialog extends ContentDialog {

@@ -1,6 +1,6 @@
-package com.mihoyo.genshinimpact
+package com.ludashi.benchmark
 
-import com.mihoyo.genshinimpact.enums.OS
+import com.ludashi.benchmark.enums.OS
 import java.util.EnumSet
 import junit.framework.TestCase.assertEquals
 import org.junit.Test

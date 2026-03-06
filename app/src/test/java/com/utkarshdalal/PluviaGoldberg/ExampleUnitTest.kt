@@ -1,4 +1,4 @@
-package com.mihoyo.genshinimpact
+package com.ludashi.benchmark
 
 import org.junit.Assert.*
 import org.junit.Test

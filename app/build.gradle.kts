@@ -29,7 +29,7 @@ room {
 }
 
 android {
-    namespace = "com.mihoyo.genshinimpact"
+    namespace = "com.ludashi.benchmark"
     compileSdk = 35
 
     // https://developer.android.com/ndk/downloads
@@ -47,7 +47,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.mihoyo.genshinimpact"
+        applicationId = "com.ludashi.benchmark"
 
         minSdk = 26
         targetSdk = 28
